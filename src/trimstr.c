@@ -3,7 +3,7 @@
 Name        : trimstr.c
 Author      : Yi Yi
 Version     :
-Copyright   : Under Simplified BSD License
+Copyright   : Under Apache License 2.0
 Description : Trim the space at the head of rear of a string in C, Ansi-style
 ============================================================================
 */

@@ -3,7 +3,7 @@
 Name        : convstr.c
 Author      : Yi Yi
 Version     :
-Copyright   : Under Simplified BSD License
+Copyright   : Under Apache License 2.0
 Description : Converse string in C, Ansi-style
 ============================================================================
 */

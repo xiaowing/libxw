@@ -3,7 +3,7 @@
 Name        : minivm.c
 Author      : Yi Yi
 Version     :
-Copyright   : Under Simplified BSD License
+Copyright   : Under Apache License 2.0
 Description : Implementation of a minium vm to manage the stack and queue
 ============================================================================
 */

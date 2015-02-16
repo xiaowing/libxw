@@ -3,7 +3,7 @@
 Name        : libxwdef.h
 Author      : Yi Yi
 Version     :
-Copyright   : Under Simplified BSD License
+Copyright   : Under Apache License 2.0
 Description : The header of the general definition of macros used in libxw.
 ============================================================================
 */
