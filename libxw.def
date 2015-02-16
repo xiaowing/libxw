@@ -1,0 +1,10 @@
+LIBRARY
+EXPORTS
+	convstr
+	trimstr
+	stack_create
+	stack_dispose
+	stack_items_counter
+	stack_peek
+	stack_pop
+	stack_push
