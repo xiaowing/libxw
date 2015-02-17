@@ -1,5 +1,6 @@
 #file
 *.sdf
+*.opensdf
 *.user
 *.suo
 
