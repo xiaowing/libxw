@@ -241,7 +241,10 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
     if (table->spare != NULL){
         avail = remove_last_node_from_list(table->spare);
         if (avail->datatype == NODE_DATANODE_SPARE){
-            memset((char *)avail, 0x00, sizeof(LIBXW_DATANODE));
+            /* memset((char *)avail, 0x00, sizeof(LIBXW_DATANODE)); */
+            /* no need to memset, because all the field, except the datatype, 
+               will be zero after the node retrieved from spare list. */
+            avail->datatype = 0x00;
             return avail;
         }
         else{
@@ -324,9 +327,9 @@ LIBXW_MANAGED_STACK* stack_create(LIBXW_VALUE_TYPE value_type){
 }
 
 #ifdef WIN32
-int __cdecl stack_dispose(LIBXW_MANAGED_STACK *stack){
+int __cdecl stack_clear(LIBXW_MANAGED_STACK *stack){
 #else
-int stack_dispose(LIBXW_MANAGED_STACK *stack){
+int stack_clear(LIBXW_MANAGED_STACK *stack){
 #endif
     LIBXW_DATANODE *headnode = NULL, *cur = NULL;
 
@@ -342,6 +345,20 @@ int stack_dispose(LIBXW_MANAGED_STACK *stack){
         put_datanode_into_spare(GLOBAL_BLOCK_TABLE, cur);
     }
 
+    return EXIT_SUCCESS;
+}
+
+#ifdef WIN32
+int __cdecl stack_dispose(LIBXW_MANAGED_STACK *stack){
+#else
+int stack_dispose(LIBXW_MANAGED_STACK *stack){
+#endif
+    LIBXW_DATANODE *headnode = NULL;
+    int ret = 0;
+
+    if ((ret = stack_clear(stack)) < 0) return ret;
+
+    headnode = (LIBXW_DATANODE *)stack;
     put_datanode_into_spare(GLOBAL_BLOCK_TABLE, headnode);
 
     return EXIT_SUCCESS;
