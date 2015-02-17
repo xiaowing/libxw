@@ -9,8 +9,10 @@ Description : The header of libxw.
 */
 #ifndef LIBXW_HERDER_
 #define LIBXW_HERDER_
-#include <Windows.h>
 
+#ifdef WIN32
+#include <Windows.h>
+#endif
 #include "libxwdef.h"
 
 typedef void * LIBXW_MANAGED_STACK;

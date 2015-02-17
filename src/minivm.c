@@ -470,10 +470,15 @@ int stack_peek(LIBXW_MANAGED_STACK *stack, LIBXW_VALUE_TYPE value_type, void *va
     return get_datanode_value(cur, value_type, value_buf, value_len_ptr);
 }
 
+#ifdef WIN32
 BOOL WINAPI DllMain(HINSTANCE module_handle, DWORD reason_for_call, LPVOID reserved){
     LIBXW_DATABLOCK *dyn_block_list, *current_free = NULL;
 
     if (reason_for_call == DLL_PROCESS_ATTACH){
+#else
+/* the gcc attribute(constructor) declearation goes here */
+__attribute__((constructor)) void initializer(void){
+#endif
         if (GLOBAL_BLOCK_TABLE == NULL){
             GLOBAL_BLOCK_TABLE = malloc(sizeof(LIBXW_DATABLOCK_HEAD) + sizeof(LIBXW_DATABLOCK));
             if (GLOBAL_BLOCK_TABLE == NULL){
@@ -489,7 +494,12 @@ BOOL WINAPI DllMain(HINSTANCE module_handle, DWORD reason_for_call, LPVOID reser
         return TRUE;
     }
 
+#ifdef WIN32
     if (reason_for_call == DLL_PROCESS_DETACH){
+#else
+/* the gcc attribute(destructor) declearation goes here */
+__attribute__((destructor)) void finisher(void){
+#endif
         if (GLOBAL_BLOCK_TABLE != NULL){
             dyn_block_list = GLOBAL_BLOCK_TABLE->next->next;
             while (dyn_block_list != NULL){
@@ -504,7 +514,10 @@ BOOL WINAPI DllMain(HINSTANCE module_handle, DWORD reason_for_call, LPVOID reser
 
         return TRUE;
     }
+
+#ifdef WIN32
 }
+#endif
 
 #ifdef __cplusplus    // If used by C++ code, 
 }
