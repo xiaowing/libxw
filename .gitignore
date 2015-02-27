@@ -7,3 +7,5 @@
 #directories
 [Bb]in/
 [Oo]bj/
+test/lib/
+test/include/
