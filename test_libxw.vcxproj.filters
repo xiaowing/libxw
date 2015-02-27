@@ -18,5 +18,13 @@
     <ClCompile Include="test\teststack.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="test\runtest.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Tools\Programming\C\CUnit-2.1-3\CUnit\Headers\CUnit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
