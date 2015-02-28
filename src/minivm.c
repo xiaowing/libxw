@@ -74,6 +74,11 @@ typedef struct datablock_head{
 /* The global memory management table. */
 extern LIBXW_DATABLOCK_HEAD *GLOBAL_BLOCK_TABLE = NULL;
 
+/* The critical section for controlling the multi-threaded access of the global resource*/
+#ifdef WIN32
+CRITICAL_SECTION critical_sec;
+#endif
+
 /* The internal functions of minivm. */
 static LIBXW_DATABLOCK* initial_datablock(void){
     LIBXW_DATABLOCK* result = malloc(sizeof(LIBXW_DATABLOCK));
@@ -236,10 +241,17 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
 
     if (table == NULL) return NULL;
 
-    /* TODO: This function is not thread-safe yet.*/
+#ifdef WIN32
+    EnterCriticalSection(&critical_sec);
+#endif
 
     if (table->spare != NULL){
         avail = remove_last_node_from_list(table->spare);
+
+#ifdef WIN32
+        LeaveCriticalSection(&critical_sec);
+#endif
+
         if (avail->datatype == NODE_DATANODE_SPARE){
             /* memset((char *)avail, 0x00, sizeof(LIBXW_DATANODE)); */
             /* no need to memset, because all the field, except the datatype, 
@@ -252,23 +264,38 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
             exit(EXIT_PROCESS_DEBUG_EVENT);
         }
     }
+    else{
+#ifdef WIN32
+        LeaveCriticalSection(&critical_sec);
+#endif
+    }
 
+#ifdef WIN32
+    EnterCriticalSection(&critical_sec);
+#endif
     if (table->current_block != NULL){
         if (table->current_node_index < DATANODE_BLOCK_LENGTH){
             avail = &(table->current_block->nodearray[table->current_node_index]);
             table->current_node_index += 1;
-            return avail;
         }
-        
-        if (table->current_node_index == DATANODE_BLOCK_LENGTH){
+        else if (table->current_node_index == DATANODE_BLOCK_LENGTH){
             newblock = initial_datablock();
             table->current_block->next = newblock;
             table->current_node_index = 0;
             avail = &(newblock->nodearray[0]);
-            return avail;
+        }
+        else{
+#ifdef WIN32
+            LeaveCriticalSection(&critical_sec);
+#endif
+            exit(EXIT_PROCESS_DEBUG_EVENT);
         }
 
-        exit(EXIT_PROCESS_DEBUG_EVENT);
+#ifdef WIN32
+        LeaveCriticalSection(&critical_sec);
+#endif
+
+        return avail;
     }
     else{
         if (table->next == NULL){
@@ -277,9 +304,15 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
             table->current_node_index = 0;
             table->next = newblock;
             avail = &(newblock->nodearray[0]);
+#ifdef WIN32
+            LeaveCriticalSection(&critical_sec);
+#endif
             return avail;
         }
         else{
+#ifdef WIN32
+            LeaveCriticalSection(&critical_sec);
+#endif
             exit(EXIT_PROCESS_DEBUG_EVENT);
         }
     }
@@ -291,6 +324,10 @@ int put_datanode_into_spare(LIBXW_DATABLOCK_HEAD *table, LIBXW_DATANODE *spareno
 
     SPARE_NODE_DATA(sparenode);
 
+#ifdef WIN32
+    EnterCriticalSection(&critical_sec);
+#endif
+
     if (table->spare != NULL){
         put_node_into_rear(table->spare, sparenode);
     }
@@ -299,6 +336,10 @@ int put_datanode_into_spare(LIBXW_DATABLOCK_HEAD *table, LIBXW_DATANODE *spareno
         table->spare->next = NULL;
         table->spare->prev = NULL;
     }
+
+#ifdef WIN32
+    LeaveCriticalSection(&critical_sec);
+#endif
 
     return EXIT_SUCCESS;
 }
@@ -508,6 +549,10 @@ __attribute__((constructor)) void initializer(void){
             GLOBAL_BLOCK_TABLE->next = GLOBAL_BLOCK_TABLE->current_block;
         }
 
+#ifdef WIN32
+        InitializeCriticalSection(&critical_sec);
+#endif
+
         return TRUE;
     }
 
@@ -528,6 +573,10 @@ __attribute__((destructor)) void finisher(void){
             free(GLOBAL_BLOCK_TABLE);
             GLOBAL_BLOCK_TABLE = NULL;
         }
+
+#ifdef WIN32
+        DeleteCriticalSection(&critical_sec);
+#endif
 
         return TRUE;
     }
