@@ -31,10 +31,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="header\libxw.h">
+    <ClInclude Include="include\libxw.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="header\libxwdef.h">
+    <ClInclude Include="include\libxwdef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

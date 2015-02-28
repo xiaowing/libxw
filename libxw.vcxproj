@@ -320,8 +320,8 @@
     <None Include="libxw.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="header\libxw.h" />
-    <ClInclude Include="header\libxwdef.h" />
+    <ClInclude Include="include\libxw.h" />
+    <ClInclude Include="include\libxwdef.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
