@@ -245,6 +245,13 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
         avail = remove_last_node_from_list(table->spare);
 
         Unlock_Mutex(&mutex_lock);
+
+        /* the spare pointer should be reset to NULL only if 
+           the last spare node is retrived to avoid infinite loop */
+        if (avail == table->spare){
+            table->spare = NULL;
+        }
+
         if (avail->datatype == NODE_DATANODE_SPARE){
             /* memset((char *)avail, 0x00, sizeof(LIBXW_DATANODE)); */
             /* no need to memset, because all the field, except the datatype, 
@@ -460,6 +467,11 @@ int stack_pop(LIBXW_MANAGED_STACK *stack, LIBXW_VALUE_TYPE value_type, void *val
 
     if (headnode->next != NULL){
         popnode = remove_last_node_from_list(headnode->next);
+
+        if (popnode == headnode->next){
+            headnode->next = NULL;
+        }
+
         cur = headnode->next;
         while (cur != NULL){
             cur = cur->next;
