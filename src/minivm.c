@@ -257,9 +257,6 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
             exit(EXIT_PROCESS_DEBUG_EVENT);
         }
     }
-    else{
-        Unlock_Mutex(&mutex_lock);
-    }
 
     if (table->current_block != NULL){
         if (table->current_node_index < DATANODE_BLOCK_LENGTH){
