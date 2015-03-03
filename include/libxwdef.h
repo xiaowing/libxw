@@ -22,4 +22,8 @@ Description : The header of the general definition of macros used in libxw.
 #define LIBXW_ERRNO_MINUSARGUMENT -4
 #define LIBXW_ERRNO_INVALIDOPRATION -5
 
+#ifndef WIN32
+#define EXIT_PROCESS_DEBUG_EVENT    5
+#endif
+
 #endif

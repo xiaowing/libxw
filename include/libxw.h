@@ -12,6 +12,8 @@ Description : The header of libxw.
 
 #ifdef WIN32
 #include <Windows.h>
+#else
+#include <pthread.h>
 #endif
 #include "libxwdef.h"
 

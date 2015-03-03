@@ -72,11 +72,13 @@ typedef struct datablock_head{
     datanode_ptr->datatype = NODE_DATANODE_SPARE;
 
 /* The global memory management table. */
-extern LIBXW_DATABLOCK_HEAD *GLOBAL_BLOCK_TABLE = NULL;
+LIBXW_DATABLOCK_HEAD *GLOBAL_BLOCK_TABLE = NULL;
 
 /* The critical section for controlling the multi-threaded access of the global resource*/
 #ifdef WIN32
 CRITICAL_SECTION critical_sec;
+#else
+pthread_mutex_t   mutex_lock = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
 /* The internal functions of minivm. */
@@ -243,6 +245,8 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
 
 #ifdef WIN32
     EnterCriticalSection(&critical_sec);
+#else
+    pthread_mutex_lock(&mutex_lock);
 #endif
 
     if (table->spare != NULL){
@@ -250,6 +254,8 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
 
 #ifdef WIN32
         LeaveCriticalSection(&critical_sec);
+#else
+        pthread_mutex_unlock(&mutex_lock);
 #endif
 
         if (avail->datatype == NODE_DATANODE_SPARE){
@@ -267,11 +273,15 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
     else{
 #ifdef WIN32
         LeaveCriticalSection(&critical_sec);
+#else
+        pthread_mutex_unlock(&mutex_lock);
 #endif
     }
 
 #ifdef WIN32
     EnterCriticalSection(&critical_sec);
+#else
+    pthread_mutex_lock(&mutex_lock);
 #endif
     if (table->current_block != NULL){
         if (table->current_node_index < DATANODE_BLOCK_LENGTH){
@@ -287,12 +297,16 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
         else{
 #ifdef WIN32
             LeaveCriticalSection(&critical_sec);
+#else
+            pthread_mutex_unlock(&mutex_lock);
 #endif
             exit(EXIT_PROCESS_DEBUG_EVENT);
         }
 
 #ifdef WIN32
         LeaveCriticalSection(&critical_sec);
+#else
+        pthread_mutex_unlock(&mutex_lock);
 #endif
 
         return avail;
@@ -306,12 +320,16 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
             avail = &(newblock->nodearray[0]);
 #ifdef WIN32
             LeaveCriticalSection(&critical_sec);
+#else
+            pthread_mutex_unlock(&mutex_lock);
 #endif
             return avail;
         }
         else{
 #ifdef WIN32
             LeaveCriticalSection(&critical_sec);
+#else
+            pthread_mutex_unlock(&mutex_lock);
 #endif
             exit(EXIT_PROCESS_DEBUG_EVENT);
         }
@@ -326,6 +344,8 @@ int put_datanode_into_spare(LIBXW_DATABLOCK_HEAD *table, LIBXW_DATANODE *spareno
 
 #ifdef WIN32
     EnterCriticalSection(&critical_sec);
+#else
+    pthread_mutex_lock(&mutex_lock);
 #endif
 
     if (table->spare != NULL){
@@ -339,6 +359,8 @@ int put_datanode_into_spare(LIBXW_DATABLOCK_HEAD *table, LIBXW_DATANODE *spareno
 
 #ifdef WIN32
     LeaveCriticalSection(&critical_sec);
+#else
+    pthread_mutex_unlock(&mutex_lock);
 #endif
 
     return EXIT_SUCCESS;
@@ -530,7 +552,7 @@ int stack_peek(LIBXW_MANAGED_STACK *stack, LIBXW_VALUE_TYPE value_type, void *va
 
 #ifdef WIN32
 BOOL WINAPI DllMain(HINSTANCE module_handle, DWORD reason_for_call, LPVOID reserved){
-    LIBXW_DATABLOCK *dyn_block_list, *current_free = NULL;
+    LIBXW_DATABLOCK *dyn_block_list = NULL, *current_free = NULL;
 
     if (reason_for_call == DLL_PROCESS_ATTACH){
 #else
@@ -540,7 +562,9 @@ __attribute__((constructor)) void initializer(void){
         if (GLOBAL_BLOCK_TABLE == NULL){
             GLOBAL_BLOCK_TABLE = malloc(sizeof(LIBXW_DATABLOCK_HEAD) + sizeof(LIBXW_DATABLOCK));
             if (GLOBAL_BLOCK_TABLE == NULL){
+#ifdef WIN32
                 return FALSE;
+#endif
             }
 
             memset((char *)GLOBAL_BLOCK_TABLE, 0x00, (sizeof(LIBXW_DATABLOCK_HEAD) + sizeof(LIBXW_DATABLOCK)));
@@ -551,9 +575,8 @@ __attribute__((constructor)) void initializer(void){
 
 #ifdef WIN32
         InitializeCriticalSection(&critical_sec);
-#endif
-
         return TRUE;
+#endif
     }
 
 #ifdef WIN32
@@ -561,6 +584,7 @@ __attribute__((constructor)) void initializer(void){
 #else
 /* the gcc attribute(destructor) declearation goes here */
 __attribute__((destructor)) void finisher(void){
+        LIBXW_DATABLOCK *dyn_block_list = NULL, *current_free = NULL;
 #endif
         if (GLOBAL_BLOCK_TABLE != NULL){
             dyn_block_list = GLOBAL_BLOCK_TABLE->next->next;
@@ -576,9 +600,10 @@ __attribute__((destructor)) void finisher(void){
 
 #ifdef WIN32
         DeleteCriticalSection(&critical_sec);
-#endif
-
         return TRUE;
+#else
+        pthread_mutex_destroy(&mutex_lock);
+#endif
     }
 
 #ifdef WIN32
