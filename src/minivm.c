@@ -244,13 +244,13 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
     if (table->spare != NULL){
         avail = remove_last_node_from_list(table->spare);
 
-        Unlock_Mutex(&mutex_lock);
-
         /* the spare pointer should be reset to NULL only if 
            the last spare node is retrived to avoid infinite loop */
         if (avail == table->spare){
             table->spare = NULL;
         }
+
+        Unlock_Mutex(&mutex_lock);
 
         if (avail->datatype == NODE_DATANODE_SPARE){
             /* memset((char *)avail, 0x00, sizeof(LIBXW_DATANODE)); */
@@ -264,8 +264,7 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
             exit(EXIT_PROCESS_DEBUG_EVENT);
         }
     }
-
-    if (table->current_block != NULL){
+    else if (table->current_block != NULL){
         if (table->current_node_index < DATANODE_BLOCK_LENGTH){
             avail = &(table->current_block->nodearray[table->current_node_index]);
             table->current_node_index += 1;
@@ -273,8 +272,9 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
         else if (table->current_node_index == DATANODE_BLOCK_LENGTH){
             newblock = initial_datablock();
             table->current_block->next = newblock;
+            table->current_block = newblock;
             table->current_node_index = 0;
-            avail = &(newblock->nodearray[0]);
+            avail = &(table->current_block->nodearray[0]);
         }
         else{
             Unlock_Mutex(&mutex_lock);
@@ -287,10 +287,10 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
     else{
         if (table->next == NULL){
             newblock = initial_datablock();
-            table->current_block->next = newblock;
-            table->current_node_index = 0;
             table->next = newblock;
-            avail = &(newblock->nodearray[0]);
+            table->current_block = newblock;
+            table->current_node_index = 0;
+            avail = &(table->current_block->nodearray[0]);
             Unlock_Mutex(&mutex_lock);
             return avail;
         }
