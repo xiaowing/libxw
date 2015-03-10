@@ -273,8 +273,8 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
             newblock = initial_datablock();
             table->current_block->next = newblock;
             table->current_block = newblock;
-            table->current_node_index = 0;
             avail = &(table->current_block->nodearray[0]);
+            table->current_node_index = 1;
         }
         else{
             Unlock_Mutex(&mutex_lock);
@@ -289,8 +289,8 @@ static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
             newblock = initial_datablock();
             table->next = newblock;
             table->current_block = newblock;
-            table->current_node_index = 0;
             avail = &(table->current_block->nodearray[0]);
+            table->current_node_index = 1;
             Unlock_Mutex(&mutex_lock);
             return avail;
         }
@@ -472,11 +472,14 @@ int stack_pop(LIBXW_MANAGED_STACK *stack, LIBXW_VALUE_TYPE value_type, void *val
             headnode->next = NULL;
         }
 
-        cur = headnode->next;
-        while (cur != NULL){
+        cur = headnode;
+        /* TODO: FIX IT!!*/
+        while (cur->next != NULL){
             cur = cur->next;
         }
-        TOPPTR_VALUE(headnode) = cur;
+        if (cur != headnode){
+            TOPPTR_VALUE(headnode) = cur;
+        }
 
         ret = get_datanode_value(popnode, value_type, value_buf, value_len_ptr);
         
