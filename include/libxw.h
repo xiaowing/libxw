@@ -36,12 +36,82 @@ typedef enum  node_value_type{
     NODE_DATANODE_SPARE = 0x1000,
 }LIBXW_VALUE_TYPE;
 
+#define _createnode_body(type, nodetype, a) \
+{ \
+    LIBXW_DATANODE *headnode = NULL; \
+    switch (a){ \
+    case NODE_HEADNODE_STACK:   \
+    case NODE_HEADNODE_QUEUE:   \
+    case NODE_DATANODE_SPARE:   \
+        return NULL;    \
+        }   \
+    headnode = get_next_available_node(GLOBAL_BLOCK_TABLE); \
+    if (headnode != NULL){  \
+        headnode->datatype = (NODE_HEADNODE_##nodetype | a);  \
+        }   \
+    return (type)headnode;  \
+}
+
+#ifdef WIN32
+#define _createnode(type, name, nodetype, atype, a) \
+type __cdecl name(atype a) \
+_createnode_body(type, nodetype, a)
+#else
+#define _createnode(type, name, nodetype, atype, a) \
+type  name(atype a) \
+_createnode_body(type, nodetype, a)
+#endif
+
+#define _clearnodes_body(nodetype, a) \
+{ \
+    LIBXW_DATANODE *headnode = NULL, *cur = NULL; \
+    if (a == NULL) return LIBXW_ERRNO_NULLSTACK; \
+    headnode = (LIBXW_DATANODE *)a; \
+    if ((headnode->datatype & NODE_HEADNODE_##nodetype) == 0) \
+        return LIBXW_ERRNO_INVALID_NODETYPE; \
+    while (headnode->next != NULL){ \
+        cur = remove_current_node_from_list(headnode->next); \
+        put_datanode_into_spare(GLOBAL_BLOCK_TABLE, cur); \
+    } \
+    return EXIT_SUCCESS; \
+}
+
+#ifdef WIN32
+#define _clearnodes(type, name, nodetype, atype, a) \
+type __cdecl name(atype a) \
+_clearnodes_body(nodetype, a)
+#else
+#define _clearnodes(type, name, nodetype, atype, a) \
+type name(atype a) \
+_clearnodes_body(nodetype, a)
+#endif
+
+#define _diposehead_body(a) \
+{ \
+    LIBXW_DATANODE *headnode = NULL; \
+    int ret = 0; \
+    if ((ret = stack_clear(a)) < 0) return ret; \
+    headnode = (LIBXW_DATANODE *)a; \
+    put_datanode_into_spare(GLOBAL_BLOCK_TABLE, headnode); \
+    return EXIT_SUCCESS; \
+}
+
+#ifdef WIN32
+#define _diposehead(type, name, atype, a) \
+type __cdecl name(atype a) \
+_diposehead_body(a)
+#else
+#define _diposehead(type, name, atype, a) \
+type name(atype a) \
+_diposehead_body(a)
+#endif
+
 /* The declearation of the interfaces. */
 int convstr(char *);
 int trimstr(char *);
 LIBXW_MANAGED_STACK stack_create(LIBXW_VALUE_TYPE);
 int stack_dispose(LIBXW_MANAGED_STACK);
-int stack_items_counter(LIBXW_MANAGED_STACK);
+int stack_count(LIBXW_MANAGED_STACK);
 int stack_peek(LIBXW_MANAGED_STACK, LIBXW_VALUE_TYPE, void *, int *);
 int stack_pop(LIBXW_MANAGED_STACK, LIBXW_VALUE_TYPE, void *, int *);
 int stack_push(LIBXW_MANAGED_STACK, LIBXW_VALUE_TYPE, void *, int);

@@ -5,8 +5,7 @@
 #include "CUnit.h"
 
 #define STACK_DEPTH  5
-#define THREAD_NUM   256   /* TODO: Weird! If I keep the THREAD_NUM as 200+, one or more assertion in ThreadExec() will fail.*/
-                           /* It looks like a bug. */
+#define THREAD_NUM   256   
 
 #ifdef TEST_DEBUG
 int thread_count = 0;
@@ -27,7 +26,7 @@ void test_stack_basic(void){
 
     stack_push(stack, NODE_VALUE_INTEGER, &foo, sizeof(int));
 
-    CU_ASSERT_EQUAL(stack_items_counter(stack), 1);
+    CU_ASSERT_EQUAL(stack_count(stack), 1);
 
     stack_peek(stack, NODE_VALUE_INTEGER, &tmp, &size);
 

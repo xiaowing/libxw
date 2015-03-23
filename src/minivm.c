@@ -324,70 +324,19 @@ int put_datanode_into_spare(LIBXW_DATABLOCK_HEAD *table, LIBXW_DATANODE *spareno
 }
 
 /* The definition of external interface. */
-#ifdef WIN32
-LIBXW_MANAGED_STACK __cdecl stack_create(LIBXW_VALUE_TYPE value_type){
-#else
-LIBXW_MANAGED_STACK stack_create(LIBXW_VALUE_TYPE value_type){
-#endif
-    LIBXW_DATANODE *headnode = NULL;
+/* stack_create() */
+_createnode(LIBXW_MANAGED_STACK, stack_create, STACK, LIBXW_VALUE_TYPE, value_type)
 
-    switch (value_type){
-        case NODE_HEADNODE_STACK:
-        case NODE_HEADNODE_QUEUE:
-        case NODE_DATANODE_SPARE:
-            return NULL;
-    }
+/* stack_clear() */
+_clearnodes(int, stack_clear, STACK, LIBXW_MANAGED_STACK, stack)
 
-    headnode = get_next_available_node(GLOBAL_BLOCK_TABLE);
-    if (headnode != NULL){
-        headnode->datatype = NODE_HEADNODE_STACK | value_type;
-    }
-
-    return (LIBXW_MANAGED_STACK*)headnode;
-}
+/* stack_dispose() */
+_diposehead(int, stack_dispose, LIBXW_MANAGED_STACK, stack)
 
 #ifdef WIN32
-int __cdecl stack_clear(LIBXW_MANAGED_STACK stack){
+int __cdecl stack_count(LIBXW_MANAGED_STACK stack){
 #else
-int stack_clear(LIBXW_MANAGED_STACK stack){
-#endif
-    LIBXW_DATANODE *headnode = NULL, *cur = NULL;
-
-    if (stack == NULL) return LIBXW_ERRNO_NULLSTACK;
-
-    headnode = (LIBXW_DATANODE *)stack;
-
-    if ((headnode->datatype & NODE_HEADNODE_STACK) == 0)
-        return LIBXW_ERRNO_INVALID_NODETYPE;
-
-    while (headnode->next != NULL){
-        cur = remove_current_node_from_list(headnode->next);
-        put_datanode_into_spare(GLOBAL_BLOCK_TABLE, cur);
-    }
-
-    return EXIT_SUCCESS;
-}
-
-#ifdef WIN32
-int __cdecl stack_dispose(LIBXW_MANAGED_STACK stack){
-#else
-int stack_dispose(LIBXW_MANAGED_STACK stack){
-#endif
-    LIBXW_DATANODE *headnode = NULL;
-    int ret = 0;
-
-    if ((ret = stack_clear(stack)) < 0) return ret;
-
-    headnode = (LIBXW_DATANODE *)stack;
-    put_datanode_into_spare(GLOBAL_BLOCK_TABLE, headnode);
-
-    return EXIT_SUCCESS;
-}
-
-#ifdef WIN32
-int __cdecl stack_items_counter(LIBXW_MANAGED_STACK stack){
-#else
-int stack_items_counter(LIBXW_MANAGED_STACK stack){
+int stack_count(LIBXW_MANAGED_STACK stack){
 #endif
     LIBXW_DATANODE *headnode = NULL;
     int i = 0;
@@ -507,7 +456,7 @@ int stack_peek(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void *val
     if (((headnode->datatype & NODE_HEADNODE_STACK) == 0) || ((headnode->datatype & 0xFF) != value_type))
         return LIBXW_ERRNO_INVALID_NODETYPE;
 
-    if (stack_items_counter(stack) <= 0){
+    if (stack_count(stack) <= 0){
         return LIBXW_ERRNO_INVALIDOPRATION;
     }
 
