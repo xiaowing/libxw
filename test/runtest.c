@@ -8,6 +8,7 @@
 extern "C" {
 #endif
     void AddStackTests();
+    void AddUtilityTests();
 #ifdef __cplusplus
 }
 #endif
@@ -19,6 +20,7 @@ int main(void){
     }
     else{
         AddStackTests();
+        AddUtilityTests();
 
         CU_basic_set_mode(CU_BRM_VERBOSE);
         CU_basic_run_tests();
