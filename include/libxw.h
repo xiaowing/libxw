@@ -36,16 +36,7 @@ typedef enum  node_value_type{
     NODE_DATANODE_SPARE = 0x1000,
 }LIBXW_VALUE_TYPE;
 
-/*#ifdef WIN32
-extern int __cdecl convstr(char *);
-extern int __cdecl trimstr(char *);
-LIBXW_MANAGED_STACK* __cdecl stack_create(LIBXW_VALUE_TYPE);
-int __cdecl stack_dispose(LIBXW_MANAGED_STACK *);
-int __cdecl stack_items_counter(LIBXW_MANAGED_STACK *);
-int __cdecl stack_peek(LIBXW_MANAGED_STACK *, LIBXW_VALUE_TYPE, void *, int *);
-int __cdecl stack_pop(LIBXW_MANAGED_STACK *, LIBXW_VALUE_TYPE, void *, int *);
-int __cdecl stack_push(LIBXW_MANAGED_STACK *, LIBXW_VALUE_TYPE, void *, int);
-#else*/
+/* The declearation of the interfaces. */
 int convstr(char *);
 int trimstr(char *);
 LIBXW_MANAGED_STACK stack_create(LIBXW_VALUE_TYPE);
@@ -54,6 +45,5 @@ int stack_items_counter(LIBXW_MANAGED_STACK);
 int stack_peek(LIBXW_MANAGED_STACK, LIBXW_VALUE_TYPE, void *, int *);
 int stack_pop(LIBXW_MANAGED_STACK, LIBXW_VALUE_TYPE, void *, int *);
 int stack_push(LIBXW_MANAGED_STACK, LIBXW_VALUE_TYPE, void *, int);
-/*#endif*/
 
 #endif
