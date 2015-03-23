@@ -325,9 +325,9 @@ int put_datanode_into_spare(LIBXW_DATABLOCK_HEAD *table, LIBXW_DATANODE *spareno
 
 /* The definition of external interface. */
 #ifdef WIN32
-LIBXW_MANAGED_STACK* __cdecl stack_create(LIBXW_VALUE_TYPE value_type){
+LIBXW_MANAGED_STACK __cdecl stack_create(LIBXW_VALUE_TYPE value_type){
 #else
-LIBXW_MANAGED_STACK* stack_create(LIBXW_VALUE_TYPE value_type){
+LIBXW_MANAGED_STACK stack_create(LIBXW_VALUE_TYPE value_type){
 #endif
     LIBXW_DATANODE *headnode = NULL;
 
@@ -347,9 +347,9 @@ LIBXW_MANAGED_STACK* stack_create(LIBXW_VALUE_TYPE value_type){
 }
 
 #ifdef WIN32
-int __cdecl stack_clear(LIBXW_MANAGED_STACK *stack){
+int __cdecl stack_clear(LIBXW_MANAGED_STACK stack){
 #else
-int stack_clear(LIBXW_MANAGED_STACK *stack){
+int stack_clear(LIBXW_MANAGED_STACK stack){
 #endif
     LIBXW_DATANODE *headnode = NULL, *cur = NULL;
 
@@ -369,9 +369,9 @@ int stack_clear(LIBXW_MANAGED_STACK *stack){
 }
 
 #ifdef WIN32
-int __cdecl stack_dispose(LIBXW_MANAGED_STACK *stack){
+int __cdecl stack_dispose(LIBXW_MANAGED_STACK stack){
 #else
-int stack_dispose(LIBXW_MANAGED_STACK *stack){
+int stack_dispose(LIBXW_MANAGED_STACK stack){
 #endif
     LIBXW_DATANODE *headnode = NULL;
     int ret = 0;
@@ -385,9 +385,9 @@ int stack_dispose(LIBXW_MANAGED_STACK *stack){
 }
 
 #ifdef WIN32
-int __cdecl stack_items_counter(LIBXW_MANAGED_STACK *stack){
+int __cdecl stack_items_counter(LIBXW_MANAGED_STACK stack){
 #else
-int stack_items_counter(LIBXW_MANAGED_STACK *stack){
+int stack_items_counter(LIBXW_MANAGED_STACK stack){
 #endif
     LIBXW_DATANODE *headnode = NULL;
     int i = 0;
@@ -413,9 +413,9 @@ int stack_items_counter(LIBXW_MANAGED_STACK *stack){
 }
 
 #ifdef WIN32
-int __cdecl stack_push(LIBXW_MANAGED_STACK *stack, LIBXW_VALUE_TYPE value_type, void * value_ptr, int value_len){
+int __cdecl stack_push(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void * value_ptr, int value_len){
 #else
-int stack_push(LIBXW_MANAGED_STACK *stack, LIBXW_VALUE_TYPE value_type, void * value_ptr, int value_len){
+int stack_push(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void * value_ptr, int value_len){
 #endif
     LIBXW_DATANODE *headnode = NULL, *newnode = NULL;
 
@@ -451,9 +451,9 @@ int stack_push(LIBXW_MANAGED_STACK *stack, LIBXW_VALUE_TYPE value_type, void * v
 }
 
 #ifdef WIN32
-int __cdecl stack_pop(LIBXW_MANAGED_STACK *stack, LIBXW_VALUE_TYPE value_type, void *value_buf ,int *value_len_ptr){
+int __cdecl stack_pop(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void *value_buf ,int *value_len_ptr){
 #else
-int stack_pop(LIBXW_MANAGED_STACK *stack, LIBXW_VALUE_TYPE value_type, void *value_buf, int *value_len_ptr){
+int stack_pop(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void *value_buf, int *value_len_ptr){
 #endif
     LIBXW_DATANODE *headnode = NULL, *popnode = NULL, *cur = NULL;
     int ret = 0;
@@ -494,9 +494,9 @@ int stack_pop(LIBXW_MANAGED_STACK *stack, LIBXW_VALUE_TYPE value_type, void *val
 }
 
 #ifdef WIN32
-int __cdecl stack_peek(LIBXW_MANAGED_STACK *stack, LIBXW_VALUE_TYPE value_type, void *value_buf, int *value_len_ptr){
+int __cdecl stack_peek(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void *value_buf, int *value_len_ptr){
 #else
-int stack_peek(LIBXW_MANAGED_STACK *stack, LIBXW_VALUE_TYPE value_type, void *value_buf, int *value_len_ptr){
+int stack_peek(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void *value_buf, int *value_len_ptr){
 #endif
     LIBXW_DATANODE *headnode = NULL, *cur = NULL;
 

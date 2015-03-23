@@ -22,7 +22,7 @@ void test_stack_basic(void){
     int foo = 12048, bar = 2048;
     int tmp = 0, size = 0;
 
-    LIBXW_MANAGED_STACK *stack = NULL;
+    LIBXW_MANAGED_STACK stack = NULL;
     stack = stack_create(NODE_VALUE_INTEGER);
 
     stack_push(stack, NODE_VALUE_INTEGER, &foo, sizeof(int));
@@ -44,7 +44,7 @@ void test_stack_basic(void){
 
 void test_stacks_in_oneblock(void){
     int i = 0;
-    LIBXW_MANAGED_STACK *first = NULL, *last = NULL, *onemore = NULL;
+    LIBXW_MANAGED_STACK first = NULL, last = NULL, onemore = NULL;
     first = stack_create(NODE_VALUE_INTEGER);
     for (i = 1; i < (DATANODE_BLOCK_LENGTH - 1); i++){
         stack_push(first, NODE_VALUE_INTEGER, &i, sizeof(int));
@@ -52,7 +52,7 @@ void test_stacks_in_oneblock(void){
     last = stack_create(NODE_VALUE_INTEGER);
     onemore = stack_create(NODE_VALUE_INTEGER);
 
-    CU_ASSERT_EQUAL((last - first) % (DATANODE_BLOCK_LENGTH - 1), 0);
+    CU_ASSERT_EQUAL(((char *)last - (char *)first) % (DATANODE_BLOCK_LENGTH - 1), 0);
 
     stack_dispose(last);
     stack_dispose(first);
@@ -63,7 +63,7 @@ void test_stacks_in_oneblock(void){
 #ifdef WIN32
 DWORD __stdcall ThreadExec(LPVOID pM){
 #endif
-    LIBXW_MANAGED_STACK *stk = NULL;
+    LIBXW_MANAGED_STACK stk = NULL;
     int r = 0, rad = 0, popval = 0, size = 0, current_thread_no = 0;
 
 #ifdef TEST_DEBUG
@@ -118,7 +118,7 @@ DWORD __stdcall ThreadExec(LPVOID pM){
 #ifdef WIN32
 DWORD __stdcall ThreadExecSingle(LPVOID pM){
 #endif
-    LIBXW_MANAGED_STACK *stk = NULL;
+    LIBXW_MANAGED_STACK stk = NULL;
     int r = 0, popval = 0, size = 0, current_thread_no = 0;
     int *ptr = (int *)pM;
     stk = stack_create(NODE_VALUE_INTEGER);
@@ -215,7 +215,7 @@ void test_stack_various_type(void){
 
 }
 
-CU_TestInfo testcase[] = {
+static CU_TestInfo testcase[] = {
     { "test_stack_basic:", test_stack_basic },
     { "test_stacks_in_oneblock:", test_stacks_in_oneblock },
     { "test_stacks_multi_threads", test_stacks_multi_threads },
@@ -232,7 +232,7 @@ int suite_success_clean(void){
     return 0;
 }
 
-CU_SuiteInfo suites[] = {
+static CU_SuiteInfo suites[] = {
     { "Suite of stack test", suite_success_init, suite_success_clean, NULL, NULL, testcase },
     CU_SUITE_INFO_NULL
 };
