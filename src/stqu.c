@@ -150,30 +150,6 @@ int stack_pop(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void *valu
     }
 }
 
-/*
-#ifdef WIN32
-int __cdecl stack_peek(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void *value_buf, int *value_len_ptr){
-#else
-int stack_peek(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void *value_buf, int *value_len_ptr){
-#endif
-    LIBXW_DATANODE *headnode = NULL, *cur = NULL;
-
-    if (stack == NULL) return LIBXW_ERRNO_NULLOBJECT;
-
-    headnode = (LIBXW_DATANODE *)stack;
-
-    if (((headnode->datatype & NODE_HEADNODE_STACK) == 0) || ((headnode->datatype & 0xFF) != value_type))
-        return LIBXW_ERRNO_INVALID_NODETYPE;
-
-    if (stack_count(stack) <= 0){
-        return LIBXW_ERRNO_INVALIDOPRATION;
-    }
-
-    cur = TOPPTR_VALUE(headnode);
-    return get_datanode_value(cur, value_type, value_buf, value_len_ptr);
-}
-*/
-
 /* queue_enqueue() */
 #ifdef WIN32
 int __cdecl queue_enqueue(LIBXW_MANAGED_QUEUE queue, LIBXW_VALUE_TYPE value_type, void * value_ptr, int value_len){
