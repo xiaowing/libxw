@@ -24,6 +24,9 @@
     <ClCompile Include="src\trimstr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\stqu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="libxw.def">

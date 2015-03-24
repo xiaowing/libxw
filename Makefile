@@ -16,7 +16,7 @@ INSDIR = /usr/lib
 LIBNAME = libxw.so
 VPATH = $(SRCDIR):$(INC):$(OBJDIR):$(OUTDIR)
 
-OBJ = convstr.o minivm.o trimstr.o
+OBJ = convstr.o trimstr.o minivm.o stqu.o
 TARGET = $(OBJ)
 
 objects: $(TARGET)
@@ -33,6 +33,8 @@ all: objects so
 
 install:
 	cp $(OUTDIR)/$(LIBNAME) $(INSDIR)
+
+stqu.o: minivm.o $(INC)/libxw.h $(INC)/libxwdef.h
 
 .PHONY: clean
 clean:

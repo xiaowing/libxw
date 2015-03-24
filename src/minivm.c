@@ -17,31 +17,9 @@ Description : Implementation of a minium vm to manage the stack and queue
 extern "C" {
 #endif
 
-/* Internal definition of datastructures used in minivm. */
-typedef struct datanode{
-    int datatype;
-    char value[VALUE_LENGTH];    /* The value will be the top pointer of 
-                                 the stack or queue, if the node is the head node */
-    int valuelen;
-    struct datanode *prev;
-    struct datanode *next;
-}LIBXW_DATANODE;
-
-typedef struct datablock{
-    LIBXW_DATANODE nodearray[DATANODE_BLOCK_LENGTH];
-    struct datablock *next;
-}LIBXW_DATABLOCK;
-
-typedef struct datablock_head{
-    LIBXW_DATANODE *spare;
-    LIBXW_DATABLOCK *current_block;
-    int current_node_index;
-    LIBXW_DATABLOCK *next;
-}LIBXW_DATABLOCK_HEAD;
-
 /* Shortcut macro functions. */
-#define TOPPTR_VALUE(datanode_ptr)  \
-    (*((LIBXW_DATANODE **)(datanode_ptr->value)))
+/* #define TOPPTR_VALUE(datanode_ptr)  \
+    (*((LIBXW_DATANODE **)(datanode_ptr->value))) */
 
 #define CSTRING_VALUE(datanode_ptr)  \
     (*((char **)(datanode_ptr->value)))
@@ -90,7 +68,7 @@ static LIBXW_DATABLOCK* initial_datablock(void){
     return result;
 }
 
-static LIBXW_DATANODE* remove_last_node_from_list(LIBXW_DATANODE* list){
+LIBXW_DATANODE* remove_last_node_from_list(LIBXW_DATANODE* list){
     LIBXW_DATANODE * last = NULL;
     LIBXW_DATANODE * pre = NULL;
 
@@ -114,7 +92,7 @@ static LIBXW_DATANODE* remove_last_node_from_list(LIBXW_DATANODE* list){
     }
 }
 
-static LIBXW_DATANODE* remove_current_node_from_list(LIBXW_DATANODE* cur){
+LIBXW_DATANODE* remove_current_node_from_list(LIBXW_DATANODE* cur){
     LIBXW_DATANODE * prv = NULL;
 
     if (cur != NULL){
@@ -136,7 +114,7 @@ static LIBXW_DATANODE* remove_current_node_from_list(LIBXW_DATANODE* cur){
     return cur;
 }
 
-static void put_node_into_rear(LIBXW_DATANODE* list, LIBXW_DATANODE* target){
+void put_node_into_rear(LIBXW_DATANODE* list, LIBXW_DATANODE* target){
     LIBXW_DATANODE * last = NULL;
 
      if (list != NULL){
@@ -158,7 +136,7 @@ static void put_node_into_rear(LIBXW_DATANODE* list, LIBXW_DATANODE* target){
     }
 }*/
 
-static int set_datanode_value(LIBXW_DATANODE *newnode, LIBXW_VALUE_TYPE value_type, void *value_ptr, int value_len){
+int set_datanode_value(LIBXW_DATANODE *newnode, LIBXW_VALUE_TYPE value_type, void *value_ptr, int value_len){
     switch (value_type){
     case NODE_VALUE_CHAR:
         CHAR_VALUE(newnode) = *((char *)value_ptr);
@@ -200,7 +178,7 @@ static int set_datanode_value(LIBXW_DATANODE *newnode, LIBXW_VALUE_TYPE value_ty
     return EXIT_SUCCESS;
 }
 
-static int get_datanode_value(LIBXW_DATANODE *node, LIBXW_VALUE_TYPE value_type, void * value_buf, int *value_len_ptr){
+int get_datanode_value(LIBXW_DATANODE *node, LIBXW_VALUE_TYPE value_type, void * value_buf, int *value_len_ptr){
     switch (value_type){
     case NODE_VALUE_CHAR:
         *((char *)value_buf) = CHAR_VALUE(node);
@@ -233,7 +211,7 @@ static int get_datanode_value(LIBXW_DATANODE *node, LIBXW_VALUE_TYPE value_type,
     return EXIT_SUCCESS;
 }
 
-static LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
+LIBXW_DATANODE* get_next_available_node(LIBXW_DATABLOCK_HEAD *table){
     LIBXW_DATANODE * avail = NULL;
     LIBXW_DATABLOCK * newblock = NULL;
 
@@ -323,146 +301,7 @@ int put_datanode_into_spare(LIBXW_DATABLOCK_HEAD *table, LIBXW_DATANODE *spareno
     return EXIT_SUCCESS;
 }
 
-/* The definition of external interface. */
-/* stack_create() */
-_createnode(LIBXW_MANAGED_STACK, stack_create, STACK, LIBXW_VALUE_TYPE, value_type)
 
-/* stack_clear() */
-_clearnodes(int, stack_clear, STACK, LIBXW_MANAGED_STACK, stack)
-
-/* stack_dispose() */
-_diposehead(int, stack_dispose, LIBXW_MANAGED_STACK, stack)
-
-#ifdef WIN32
-int __cdecl stack_count(LIBXW_MANAGED_STACK stack){
-#else
-int stack_count(LIBXW_MANAGED_STACK stack){
-#endif
-    LIBXW_DATANODE *headnode = NULL;
-    int i = 0;
-
-    if (stack != NULL){
-        headnode = (LIBXW_DATANODE *)stack;
-        if ((headnode->datatype & NODE_HEADNODE_STACK) > 0){
-            while (headnode->next != NULL){
-                headnode = headnode->next;
-                i++;
-            }
-            return i;
-        }
-        else{
-            /* Invalid node type */
-            return LIBXW_ERRNO_INVALID_NODETYPE;
-        }
-    }
-    else{
-        /* NULL argument. */
-        return LIBXW_ERRNO_NULLSTACK;
-    }
-}
-
-#ifdef WIN32
-int __cdecl stack_push(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void * value_ptr, int value_len){
-#else
-int stack_push(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void * value_ptr, int value_len){
-#endif
-    LIBXW_DATANODE *headnode = NULL, *newnode = NULL;
-
-    if (stack == NULL) return LIBXW_ERRNO_NULLSTACK;
-
-    if (value_ptr == NULL) return LIBXW_ERRNO_NULLARGUMENT;
-
-    if (value_len < 0) return LIBXW_ERRNO_MINUSARGUMENT;
-
-    headnode = (LIBXW_DATANODE *)stack;
-
-    if (((headnode->datatype & NODE_HEADNODE_STACK) == 0) || ((headnode->datatype & 0xFF) != value_type)) 
-        return LIBXW_ERRNO_INVALID_NODETYPE;
-
-    newnode = get_next_available_node(GLOBAL_BLOCK_TABLE);
-    if (newnode == NULL){
-        exit(EXIT_PROCESS_DEBUG_EVENT);
-    }
-
-    set_datanode_value(newnode, value_type, value_ptr, value_len);
-
-    if (headnode->next != NULL){
-        put_node_into_rear(headnode->next, newnode);
-    }
-    else{
-        headnode->next = newnode;
-        headnode->prev = NULL;
-        newnode->prev = headnode;
-    }
-    TOPPTR_VALUE(headnode) = newnode;
-
-    return EXIT_SUCCESS;
-}
-
-#ifdef WIN32
-int __cdecl stack_pop(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void *value_buf ,int *value_len_ptr){
-#else
-int stack_pop(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void *value_buf, int *value_len_ptr){
-#endif
-    LIBXW_DATANODE *headnode = NULL, *popnode = NULL, *cur = NULL;
-    int ret = 0;
-
-    if (stack == NULL) return LIBXW_ERRNO_NULLSTACK;
-
-    headnode = (LIBXW_DATANODE *)stack;
-
-    if (((headnode->datatype & NODE_HEADNODE_STACK) == 0) || ((headnode->datatype & 0xFF) != value_type)) 
-        return LIBXW_ERRNO_INVALID_NODETYPE;
-
-    if (headnode->next != NULL){
-        popnode = remove_last_node_from_list(headnode->next);
-
-        if (popnode == headnode->next){
-            headnode->next = NULL;
-        }
-
-        cur = headnode;
-        /* TODO: FIX IT!!*/
-        while (cur->next != NULL){
-            cur = cur->next;
-        }
-        if (cur != headnode){
-            TOPPTR_VALUE(headnode) = cur;
-        }
-
-        ret = get_datanode_value(popnode, value_type, value_buf, value_len_ptr);
-        
-        put_datanode_into_spare(GLOBAL_BLOCK_TABLE, popnode);
-
-        return ret;
-    }
-    else{
-        TOPPTR_VALUE(headnode) = NULL;
-        return LIBXW_ERRNO_INVALIDOPRATION;
-    }
-}
-
-#ifdef WIN32
-int __cdecl stack_peek(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void *value_buf, int *value_len_ptr){
-#else
-int stack_peek(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void *value_buf, int *value_len_ptr){
-#endif
-    LIBXW_DATANODE *headnode = NULL, *cur = NULL;
-
-    if (stack == NULL) return LIBXW_ERRNO_NULLSTACK;
-
-    headnode = (LIBXW_DATANODE *)stack;
-
-    if (((headnode->datatype & NODE_HEADNODE_STACK) == 0) || ((headnode->datatype & 0xFF) != value_type))
-        return LIBXW_ERRNO_INVALID_NODETYPE;
-
-    if (stack_count(stack) <= 0){
-        return LIBXW_ERRNO_INVALIDOPRATION;
-    }
-
-    cur = TOPPTR_VALUE(headnode);
-    return get_datanode_value(cur, value_type, value_buf, value_len_ptr);
-}
 
 #ifdef WIN32
 BOOL WINAPI DllMain(HINSTANCE module_handle, DWORD reason_for_call, LPVOID reserved){
