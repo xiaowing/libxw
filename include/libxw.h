@@ -65,7 +65,7 @@ _createnode_body(type, nodetype, a)
 #define _clearnodes_body(nodetype, a) \
 { \
     LIBXW_DATANODE *headnode = NULL, *cur = NULL; \
-    if (a == NULL) return LIBXW_ERRNO_NULLSTACK; \
+    if (a == NULL) return LIBXW_ERRNO_NULLOBJECT; \
     headnode = (LIBXW_DATANODE *)a; \
     if ((headnode->datatype & NODE_HEADNODE_##nodetype) == 0) \
         return LIBXW_ERRNO_INVALID_NODETYPE; \
@@ -106,14 +106,80 @@ type name(atype a) \
 _diposehead_body(a)
 #endif
 
+#define _nodescount_body(nodetype, a) \
+{ \
+    LIBXW_DATANODE *headnode = NULL; \
+    int i = 0; \
+    if (a != NULL){ \
+        headnode = (LIBXW_DATANODE *)a; \
+        if ((headnode->datatype & NODE_HEADNODE_##nodetype) > 0){ \
+            while (headnode->next != NULL){ \
+                headnode = headnode->next; \
+                i++; \
+            } \
+            return i; \
+        } \
+        else{ \
+            return LIBXW_ERRNO_INVALID_NODETYPE; \
+        } \
+    } \
+    else{ \
+        return LIBXW_ERRNO_NULLOBJECT; \
+    } \
+}
+
+#ifdef WIN32
+#define _nodescount(type, name, nodetype, atype, a) \
+type __cdecl name(atype a) \
+_nodescount_body(nodetype, a)
+#else
+#define _nodescount(type, name, nodetype, atype, a) \
+type name(atype a) \
+_nodescount_body(nodetype, a)
+#endif
+
+
+#define _nodespeek_body(nodetype, a, b, c, d) \
+{ \
+    LIBXW_DATANODE *headnode = NULL, *cur = NULL; \
+    if (a == NULL) return LIBXW_ERRNO_NULLOBJECT; \
+    headnode = (LIBXW_DATANODE *)a; \
+    if (((headnode->datatype & NODE_HEADNODE_##nodetype) == 0) || ((headnode->datatype & 0xFF) != b)) \
+        return LIBXW_ERRNO_INVALID_NODETYPE; \
+    if (TOPPTR_VALUE(headnode) == NULL) return LIBXW_ERRNO_INVALIDOPRATION; \
+    cur = TOPPTR_VALUE(headnode); \
+    return get_datanode_value(cur, b, c, d); \
+}
+
+#ifdef WIN32
+#define _nodespeek(type, name, nodetype, atype, a, btype, b, ctype, c, dtype, d) \
+type __cdecl name(atype a, btype b, ctype c, dtype d) \
+_nodespeek_body(nodetype, a, b, c, d)
+#else
+type name(atype a, btype b, ctype c, dtype d) \
+_nodespeek_body(nodetype, a, b, c, d)
+#endif
+
+
+
 /* The declearation of the interfaces. */
 int convstr(char *);
 int trimstr(char *);
+
 LIBXW_MANAGED_STACK stack_create(LIBXW_VALUE_TYPE);
 int stack_dispose(LIBXW_MANAGED_STACK);
+int stack_clear(LIBXW_MANAGED_STACK);
 int stack_count(LIBXW_MANAGED_STACK);
 int stack_peek(LIBXW_MANAGED_STACK, LIBXW_VALUE_TYPE, void *, int *);
 int stack_pop(LIBXW_MANAGED_STACK, LIBXW_VALUE_TYPE, void *, int *);
 int stack_push(LIBXW_MANAGED_STACK, LIBXW_VALUE_TYPE, void *, int);
+
+LIBXW_MANAGED_QUEUE queue_create(LIBXW_VALUE_TYPE);
+int queue_dispose(LIBXW_MANAGED_QUEUE);
+int queue_clear(LIBXW_MANAGED_QUEUE);
+int queue_count(LIBXW_MANAGED_QUEUE);
+int queue_peek(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int *);
+int queue_enqueue(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int *);
+int queue_dequeue(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int);
 
 #endif

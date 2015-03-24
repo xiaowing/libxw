@@ -24,6 +24,9 @@
     <ClCompile Include="test\testutil.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="test\testqueue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Tools\Programming\C\CUnit-2.1-3\CUnit\Headers\CUnit.h">

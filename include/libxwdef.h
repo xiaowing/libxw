@@ -16,7 +16,7 @@ Description : The header of the general definition of macros used in libxw.
 #define DUMMY_LENGTH    8
 #define DATANODE_BLOCK_LENGTH   256
 
-#define LIBXW_ERRNO_NULLSTACK -1
+#define LIBXW_ERRNO_NULLOBJECT -1
 #define LIBXW_ERRNO_INVALID_NODETYPE -2
 #define LIBXW_ERRNO_NULLARGUMENT -3
 #define LIBXW_ERRNO_MINUSARGUMENT -4

@@ -4,7 +4,15 @@ EXPORTS
 	trimstr
 	stack_create
 	stack_dispose
+	stack_clear
 	stack_count
 	stack_peek
 	stack_pop
 	stack_push
+	queue_create
+	queue_dispose
+	queue_clear
+	queue_count
+	queue_peek
+	queue_enqueue
+	queue_dequeue
