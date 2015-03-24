@@ -156,6 +156,7 @@ _nodescount_body(nodetype, a)
 type __cdecl name(atype a, btype b, ctype c, dtype d) \
 _nodespeek_body(nodetype, a, b, c, d)
 #else
+#define _nodespeek(type, name, nodetype, atype, a, btype, b, ctype, c, dtype, d) \
 type name(atype a, btype b, ctype c, dtype d) \
 _nodespeek_body(nodetype, a, b, c, d)
 #endif
