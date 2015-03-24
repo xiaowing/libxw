@@ -180,7 +180,7 @@ int queue_dispose(LIBXW_MANAGED_QUEUE);
 int queue_clear(LIBXW_MANAGED_QUEUE);
 int queue_count(LIBXW_MANAGED_QUEUE);
 int queue_peek(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int *);
-int queue_enqueue(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int *);
-int queue_dequeue(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int);
+int queue_enqueue(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int);
+int queue_dequeue(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int *);
 
 #endif
