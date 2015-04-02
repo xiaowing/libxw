@@ -61,51 +61,23 @@ void test_stacks_in_oneblock(void){
 
 #ifdef WIN32
 DWORD __stdcall ThreadExec(LPVOID pM){
+#else
+void* ThreadExec(void* arg){
 #endif
     LIBXW_MANAGED_STACK stk = NULL;
-    int r = 0, rad = 0, popval = 0, size = 0, current_thread_no = 0;
-
-#ifdef TEST_DEBUG
-    Lock_Mutex(&mutex);
-    current_thread_no = thread_count++;
-    Unlock_Mutex(&mutex);
-#endif
+    int r = 0, rad = 0, popval = 0, size = 0, current_thread_no = 0, i = 0;
 
     stk = stack_create(NODE_VALUE_INTEGER);
     srand((unsigned)time(NULL));    /* set randam seed */
 
-    for (int i = 0; i < STACK_DEPTH; i++){
+    for (i = 0; i < STACK_DEPTH; i++){
         r = rand();
         stack_push(stk, NODE_VALUE_INTEGER, &r, sizeof(int));
-#ifdef TEST_DEBUG
-        if (current_thread_no == 154){
-            printf("Pushing ...... %d.\n", r);
-        }
-#endif
     }
 
-#ifdef TEST_DEBUG
-    if ((current_thread_no == 154) || ((current_thread_no == 206))){
-        printf("return value of pop is %d.\n",
-            stack_pop(stk, NODE_VALUE_INTEGER, &popval, &size));
-    }
-    else{
-        stack_pop(stk, NODE_VALUE_INTEGER, &popval, &size);
-    }
-#else
     stack_pop(stk, NODE_VALUE_INTEGER, &popval, &size);
-#endif
 
     CU_ASSERT_EQUAL(popval, r);
-#ifdef TEST_DEBUG
-    if (popval != r){
-        printf("The failed thread No. is %d.\n", current_thread_no);
-        do{
-            printf("%d poped.\n", popval);
-        } while (stack_pop(stk, NODE_VALUE_INTEGER, &popval, &size) >= 0);
-    }
-#endif
-
     /* dispose the stack randomly. */
     srand((unsigned)time(NULL));    /* set randam seed */
     if((rad = rand()) % 2 == 0)
@@ -116,14 +88,16 @@ DWORD __stdcall ThreadExec(LPVOID pM){
 
 #ifdef WIN32
 DWORD __stdcall ThreadExecSingle(LPVOID pM){
+#else
+int ThreadExecSingle(void* pM){
 #endif
     LIBXW_MANAGED_STACK stk = NULL;
-    int r = 0, popval = 0, size = 0, current_thread_no = 0;
+    int r = 0, popval = 0, size = 0, current_thread_no = 0, i = 0;
     int *ptr = (int *)pM;
     stk = stack_create(NODE_VALUE_INTEGER);
     srand((unsigned)time(NULL));    /* set randam seed */
 
-    for (int i = 0; i < STACK_DEPTH; i++){
+    for (i = 0; i < STACK_DEPTH; i++){
         r = rand();
         stack_push(stk, NODE_VALUE_INTEGER, &r, sizeof(int));
     }
@@ -144,24 +118,28 @@ DWORD __stdcall ThreadExecSingle(LPVOID pM){
 void test_stacks_multi_threads(void){
 #ifdef WIN32
     HANDLE handles[THREAD_NUM];
+#else
+    pthread_t handles[THREAD_NUM];
 #endif
 
-#ifdef TEST_DEBUG
-    Initialize_Mutex(&mutex);
-#endif
+#ifndef WIN32
+    pthread_setconcurrency(THREAD_NUM);
+#endif   
 
     for (int i = 0; i < THREAD_NUM; i++){
 #ifdef WIN32
         handles[i] = CreateThread(NULL, 0, ThreadExec, NULL, 0, NULL);
+#else
+        pthread_create(&handles[i], NULL, ThreadExec, NULL);
 #endif
     }
 
 #ifdef WIN32
     WaitForMultipleObjects(THREAD_NUM, handles, TRUE, INFINITE);
-#endif
-
-#ifdef TEST_DEBUG
-    Destroy_Mutex(&mutex);
+#else
+    for(i = 0; i < THREAD_NUM;i++){
+        pthread_join(handles[i], NULL);
+    }
 #endif
 }
 
