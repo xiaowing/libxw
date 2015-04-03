@@ -127,7 +127,7 @@ void test_stacks_multi_threads(void){
     pthread_setconcurrency(THREAD_NUM);
 #endif   
 
-    for (int i = 0; i < THREAD_NUM; i++){
+    for (i = 0; i < THREAD_NUM; i++){
 #ifdef WIN32
         handles[i] = CreateThread(NULL, 0, ThreadExec, NULL, 0, NULL);
 #else
@@ -138,16 +138,16 @@ void test_stacks_multi_threads(void){
 #ifdef WIN32
     WaitForMultipleObjects(THREAD_NUM, handles, TRUE, INFINITE);
 #else
-    for(i = 0; i < THREAD_NUM;i++){
+    for(i = 0; i < THREAD_NUM; i++){
         pthread_join(handles[i], NULL);
     }
 #endif
 }
 
 void test_stacks_single_threads(void){
-    int c = 0;
+    int c = 0, i = 0;
 
-    for (int i = 0; i < THREAD_NUM; i++){
+    for (i = 0; i < THREAD_NUM; i++){
         ThreadExecSingle(&c);
     }
 }
