@@ -116,6 +116,7 @@ int ThreadExecSingle(void* pM){
 }
 
 void test_stacks_multi_threads(void){
+    int i = 0;
 #ifdef WIN32
     HANDLE handles[THREAD_NUM];
 #else
