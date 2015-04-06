@@ -156,7 +156,7 @@ void test_stack_various_type(void){
     double d = 3.1415926, p_d = 0;
     short s = 8, p_s = 0;
     long l = 214566666666666, p_l = 0;
-    int size = 0;
+    int size = 0, i = 0;
     char buf[64] = {0x00};
     TestType src, dst;
     src.bar = 128.2048;
@@ -187,7 +187,7 @@ void test_stack_various_type(void){
     CU_ASSERT_EQUAL(dst.foo, src.foo);
     CU_ASSERT_DOUBLE_EQUAL(dst.bar, src.bar, 0.1);
 
-    for (int i = 0; i < 5; i++){
+    for (i = 0; i < 5; i++){
         stack_dispose(stacks[i]);
     }
 
@@ -212,6 +212,8 @@ int suite_success_clean(void){
 
 static CU_SuiteInfo suites[] = {
     { "Suite of stack test", suite_success_init, suite_success_clean, NULL, NULL, testcase },
+    /* for CUnit version other than 2.1.3, the above source code should be as follows */
+    /* { "Suite of stack test", suite_success_init, suite_success_clean, testcase }, */
     CU_SUITE_INFO_NULL
 };
 
