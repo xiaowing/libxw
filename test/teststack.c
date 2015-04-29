@@ -5,7 +5,9 @@
 #include "CUnit.h"
 
 #define STACK_DEPTH  5
-#define THREAD_NUM   256   
+#ifndef THREAD_NUM
+#define THREAD_NUM   256
+#endif
 
 #ifdef TEST_DEBUG
 int thread_count = 0;
@@ -60,9 +62,9 @@ void test_stacks_in_oneblock(void){
 }
 
 #ifdef WIN32
-DWORD __stdcall ThreadExec(LPVOID pM){
+static DWORD __stdcall ThreadExec(LPVOID pM){
 #else
-void* ThreadExec(void* arg){
+static void* ThreadExec(void* arg){
 #endif
     LIBXW_MANAGED_STACK stk = NULL;
     int r = 0, rad = 0, popval = 0, size = 0, current_thread_no = 0, i = 0;
