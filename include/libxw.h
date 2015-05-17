@@ -19,6 +19,7 @@ Description : The header of libxw.
 
 typedef void * LIBXW_MANAGED_STACK;
 typedef void * LIBXW_MANAGED_QUEUE;
+typedef void * LIBXW_MANAGED_MATRIX;
 // typedef int LIBXW_VALUE_TYPE;
 
 typedef enum  node_value_type{
@@ -33,7 +34,10 @@ typedef enum  node_value_type{
 
     NODE_HEADNODE_STACK = 0x100,
     NODE_HEADNODE_QUEUE = 0x200,
-    NODE_DATANODE_SPARE = 0x1000,
+    NODE_HEADNODE_CLINK_COLHEAD = 0x1000,
+    NODE_HEADNODE_CLINK_ROWHEAD = 0x2000,
+    NODE_HEADNODE_CLINK = 0x4000,
+    NODE_DATANODE_SPARE = 0x8000,
 }LIBXW_VALUE_TYPE;
 
 #define _createnode_body(type, nodetype, a) \
@@ -42,6 +46,9 @@ typedef enum  node_value_type{
     switch (a){ \
     case NODE_HEADNODE_STACK:   \
     case NODE_HEADNODE_QUEUE:   \
+    case NODE_HEADNODE_CLINK_COLHEAD:   \
+    case NODE_HEADNODE_CLINK_ROWHEAD:   \
+    case NODE_HEADNODE_CLINK:   \
     case NODE_DATANODE_SPARE:   \
         return NULL;    \
         }   \
@@ -182,5 +189,11 @@ int queue_count(LIBXW_MANAGED_QUEUE);
 int queue_peek(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int *);
 int queue_enqueue(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int);
 int queue_dequeue(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int *);
+
+LIBXW_MANAGED_MATRIX matrix_create(LIBXW_VALUE_TYPE, int, int);
+int matrix_set_item(LIBXW_MANAGED_MATRIX, LIBXW_VALUE_TYPE, void *, int, int, int);
+int matrix_get_item(LIBXW_MANAGED_MATRIX, LIBXW_VALUE_TYPE, void *, int *, int column, int row);
+int matrix_delete_item(LIBXW_MANAGED_MATRIX, int, int);
+int matrix_count_item(LIBXW_MANAGED_MATRIX);
 
 #endif

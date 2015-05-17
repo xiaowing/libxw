@@ -130,7 +130,7 @@ int stack_pop(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void *valu
         }
 
         cur = headnode;
-        /* TODO: FIX IT!!*/
+        
         while (cur->next != NULL){
             cur = cur->next;
         }

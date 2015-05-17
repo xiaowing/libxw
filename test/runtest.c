@@ -9,6 +9,7 @@ extern "C" {
 #endif
     void AddStackTests();
     void AddQueueTests();
+    void AddMatrixTests();
     void AddUtilityTests();
 #ifdef __cplusplus
 }
@@ -22,9 +23,13 @@ int main(void){
     else{
         AddStackTests();
         AddQueueTests();
+        AddMatrixTests();
         AddUtilityTests();
 
         CU_basic_set_mode(CU_BRM_VERBOSE);
         CU_basic_run_tests();
     }
+
+    printf("Press any key to continue...");
+    getchar();
 }

@@ -16,3 +16,8 @@ EXPORTS
 	queue_peek
 	queue_enqueue
 	queue_dequeue
+	matrix_create
+	matrix_set_item
+	matrix_get_item
+	matrix_delete_item
+	matrix_count_item

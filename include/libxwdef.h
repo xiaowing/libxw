@@ -14,6 +14,7 @@ Description : The header of the general definition of macros used in libxw.
 #define BUF_SIZE   256
 #define VALUE_LENGTH    8
 #define DUMMY_LENGTH    8
+#define SHORT_ARRAY_LEN 2
 #define DATANODE_BLOCK_LENGTH   256
 
 #define LIBXW_ERRNO_NULLOBJECT -1
@@ -21,6 +22,10 @@ Description : The header of the general definition of macros used in libxw.
 #define LIBXW_ERRNO_NULLARGUMENT -3
 #define LIBXW_ERRNO_MINUSARGUMENT -4
 #define LIBXW_ERRNO_INVALIDOPRATION -5
+#define LIBXW_ERRNO_COLINDEX_OUTRANGE -6
+#define LIBXW_ERRNO_ROWINDEX_OUTRANGE -7
+#define LIBXW_ERRNO_COLINDEX_EXISTED  -8
+#define LIBXW_ERRNO_NOT_FOUND         -10
 
 #ifndef WIN32
 #define EXIT_PROCESS_DEBUG_EVENT    5
@@ -43,11 +48,15 @@ typedef pthread_mutex_t   MUTEX_T, *MUTEX_P_PTR;
 /* Internal definition of datastructures used in minivm. */
 typedef struct datanode{
     int datatype;
-    char value[VALUE_LENGTH];    /* The value will be the top pointer of
-                                 the stack or queue, if the node is the head node */
+    char value[VALUE_LENGTH];       /* The value will be the top pointer of
+                                       the stack or queue, if the node is the head node */
     int valuelen;
-    struct datanode *prev;
-    struct datanode *next;
+    union {
+        char extval[VALUE_LENGTH];
+        short extrec[SHORT_ARRAY_LEN];            /* extrec[0] for colomn, extrec[1] for row. */
+    }ext;
+    struct datanode *prev;          /* down pointer in matrix */
+    struct datanode *next;          /* right pointer in matrix */
 }LIBXW_DATANODE;
 
 typedef struct datablock{

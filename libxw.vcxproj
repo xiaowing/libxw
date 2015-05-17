@@ -313,6 +313,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\convstr.c" />
+    <ClCompile Include="src\crosslnk.c" />
     <ClCompile Include="src\minivm.c" />
     <ClCompile Include="src\stqu.c" />
     <ClCompile Include="src\trimstr.c" />
