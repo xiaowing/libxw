@@ -194,6 +194,8 @@ LIBXW_MANAGED_MATRIX matrix_create(LIBXW_VALUE_TYPE, int, int);
 int matrix_set_item(LIBXW_MANAGED_MATRIX, LIBXW_VALUE_TYPE, void *, int, int, int);
 int matrix_get_item(LIBXW_MANAGED_MATRIX, LIBXW_VALUE_TYPE, void *, int *, int column, int row);
 int matrix_delete_item(LIBXW_MANAGED_MATRIX, int, int);
-int matrix_count_item(LIBXW_MANAGED_MATRIX);
+int matrix_count_items(LIBXW_MANAGED_MATRIX);
+int matrix_clear_items(LIBXW_MANAGED_MATRIX);
+int matrix_dispose(LIBXW_MANAGED_MATRIX);
 
 #endif

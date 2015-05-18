@@ -28,15 +28,15 @@ void test_matrix_basic(void){
     char * string9 = "alternated string [2, 2].\n";
 
 
-    LIBXW_MANAGED_MATRIX matrix = NULL, matrix2 = NULL;
+    LIBXW_MANAGED_MATRIX matrix = NULL, matrix2 = NULL, matrix3 = NULL;
     matrix = matrix_create(NODE_VALUE_INTEGER, 3, 2);
     CU_ASSERT_PTR_NOT_NULL(matrix);
 
     matrix_set_item(matrix, NODE_VALUE_INTEGER, &foo, sizeof(int), 1, 0);
-    CU_ASSERT_EQUAL(matrix_count_item(matrix), 1);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 1);
 
     matrix_set_item(matrix, NODE_VALUE_INTEGER, &bar, sizeof(int), 2, 1);
-    CU_ASSERT_EQUAL(matrix_count_item(matrix), 2);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 2);
 
     matrix_get_item(matrix, NODE_VALUE_INTEGER, &tmp, &size, 1, 0);
     CU_ASSERT_EQUAL(tmp, foo);
@@ -44,7 +44,7 @@ void test_matrix_basic(void){
     CU_ASSERT_EQUAL(matrix_set_item(matrix, NODE_VALUE_INTEGER, &foo, sizeof(int), 3, 0), LIBXW_ERRNO_COLINDEX_OUTRANGE);
 
     matrix_delete_item(matrix, 2, 1);
-    CU_ASSERT_EQUAL(matrix_count_item(matrix), 1);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 1);
     CU_ASSERT_EQUAL(matrix_get_item(matrix, NODE_VALUE_INTEGER, &tmp, &size, 2, 1), LIBXW_ERRNO_NOT_FOUND);
 
     matrix2 = matrix_create(NODE_VALUE_CSTRING, 5, 5);
@@ -61,7 +61,7 @@ void test_matrix_basic(void){
     matrix_set_item(matrix2, NODE_VALUE_CSTRING, string9, strlen(string9), 2, 2);
 
 
-    CU_ASSERT_EQUAL(matrix_count_item(matrix2), 8);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix2), 8);
     matrix_get_item(matrix2, NODE_VALUE_CSTRING, &buf, &size, 0, 0);
     CU_ASSERT_NSTRING_EQUAL(buf, string1, size);
     memset(buf, 0x00, sizeof(buf));
@@ -71,9 +71,20 @@ void test_matrix_basic(void){
     memset(buf, 0x00, sizeof(buf));
     matrix_get_item(matrix2, NODE_VALUE_CSTRING, &buf, &size, 2, 2);
     CU_ASSERT_NSTRING_EQUAL(buf, string9, size);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix2), 7);
 
     CU_ASSERT_EQUAL(matrix_set_item(matrix2, NODE_VALUE_CSTRING, string6, strlen(string6), 5, 5),
         LIBXW_ERRNO_COLINDEX_OUTRANGE);
+    matrix_clear_items(matrix2);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix2), 0);
+    matrix_dispose(matrix2);
+
+    matrix3 = matrix_create(NODE_VALUE_INTEGER, 2, 1);
+    CU_ASSERT_PTR_EQUAL(matrix3, matrix2);
+    matrix_set_item(matrix3, NODE_VALUE_INTEGER, &foo, sizeof(int), 0, 0);
+    matrix_set_item(matrix3, NODE_VALUE_INTEGER, &bar, sizeof(int), 1, 0);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix3), 2);
+    matrix_dispose(matrix3);
 }
 
 static CU_TestInfo testcase[] = {

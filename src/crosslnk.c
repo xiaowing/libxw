@@ -301,7 +301,7 @@ int matrix_get_item(LIBXW_MANAGED_MATRIX matrix, int column, int row){
     INTEGER_VALUE(headnode) -= 1;
 
     for (cur_ptr = result_ptr; cur_ptr->next != result_ptr; cur_ptr = cur_ptr->next){
-        if (cur_ptr->datatype & 0xFF00 == NODE_HEADNODE_CLINK_ROWHEAD){
+        if ((cur_ptr->datatype & 0xFF00) == NODE_HEADNODE_CLINK_ROWHEAD){
             INTEGER_VALUE(cur_ptr) -= 1;
         }
     }
@@ -309,7 +309,7 @@ int matrix_get_item(LIBXW_MANAGED_MATRIX matrix, int column, int row){
     result_ptr->next = NULL;
 
     for (cur_ptr = result_ptr; cur_ptr->prev != result_ptr; cur_ptr = cur_ptr->prev){
-        if (cur_ptr->datatype & 0xFF00 == NODE_HEADNODE_CLINK_COLHEAD){
+        if ((cur_ptr->datatype & 0xFF00) == NODE_HEADNODE_CLINK_COLHEAD){
             INTEGER_VALUE(cur_ptr) -= 1;
         }
     }
@@ -321,9 +321,9 @@ int matrix_get_item(LIBXW_MANAGED_MATRIX matrix, int column, int row){
 }
 
 #ifdef WIN32
-int __cdecl matrix_count_item(LIBXW_MANAGED_MATRIX matrix){
+int __cdecl matrix_count_items(LIBXW_MANAGED_MATRIX matrix){
 #else
-int matrix_count_item(LIBXW_MANAGED_MATRIX matrix){
+int matrix_count_items(LIBXW_MANAGED_MATRIX matrix){
 #endif
     LIBXW_DATANODE *headnode = NULL;
 
@@ -335,6 +335,104 @@ int matrix_count_item(LIBXW_MANAGED_MATRIX matrix){
 }
 
 /* TODO: matrix_clean_item() and matrix_dispose() */
+#ifdef WIN32
+int __cdecl matrix_clear_items(LIBXW_MANAGED_MATRIX matrix){
+#else
+int matrix_clear_items(LIBXW_MANAGED_MATRIX matrix){
+#endif
+    LIBXW_DATANODE *headnode = NULL, *flag_ptr = NULL, *cur_ptr = NULL, *prev_ptr = NULL;
+    int i = 0;
+
+    if (matrix == NULL) return LIBXW_ERRNO_NULLOBJECT;
+
+    headnode = (LIBXW_DATANODE *)matrix;
+
+    if (INTEGER_VALUE(headnode) != 0){
+        for (flag_ptr = headnode, i = -1; i < headnode->ext.extrec[EXT_COL_INDEX]; flag_ptr = flag_ptr->next, i++){
+            if ((flag_ptr->datatype & 0xFF00) == NODE_HEADNODE_CLINK) continue;
+
+            for (cur_ptr = flag_ptr->prev, prev_ptr = flag_ptr; cur_ptr != flag_ptr; cur_ptr = cur_ptr->prev){
+                /* if (cur_ptr->datatype & 0xFF00 == NODE_HEADNODE_CLINK_COLHEAD) {
+                    prev_ptr = cur_ptr;
+                    continue;
+                } */
+
+                if ((prev_ptr->datatype & 0xFF00) != NODE_HEADNODE_CLINK_COLHEAD){
+                    put_datanode_into_spare(GLOBAL_BLOCK_TABLE, prev_ptr);
+                    
+                    /* TODO: Just for test. No need to do this. INTEGER_VALUE(headnode) = 0 is fine */
+                    INTEGER_VALUE(headnode) -= 1;    
+                }
+                prev_ptr = cur_ptr;
+            }
+
+            /* An addional clean should be executed after loop because when the loop stops, one last node still exists */ 
+            if ((prev_ptr->datatype & 0xFF00) != NODE_HEADNODE_CLINK_COLHEAD){
+                put_datanode_into_spare(GLOBAL_BLOCK_TABLE, prev_ptr);
+                INTEGER_VALUE(headnode) -= 1;    /* TODO: Just for test. No need to do this */
+            }
+
+            /* recovery of the status flag. */
+            if ((flag_ptr->datatype & 0xFF00) == NODE_HEADNODE_CLINK_COLHEAD){
+                INTEGER_VALUE(flag_ptr) = 0;
+                flag_ptr->prev = flag_ptr;
+            }
+        }
+
+        for (flag_ptr = headnode, i = -1; i < headnode->ext.extrec[EXT_ROW_INDEX]; flag_ptr = flag_ptr->prev, i++){
+            if ((flag_ptr->datatype & 0xFF00) == NODE_HEADNODE_CLINK) continue;
+            
+            if ((flag_ptr->datatype & 0xFF00) == NODE_HEADNODE_CLINK_ROWHEAD){
+                INTEGER_VALUE(flag_ptr) = 0;
+                flag_ptr->next = flag_ptr;
+            }
+        }
+    }
+    return EXIT_SUCCESS;
+}
+
+#ifdef WIN32
+int __cdecl matrix_dispose(LIBXW_MANAGED_MATRIX matrix){
+#else
+int matrix_dispose(LIBXW_MANAGED_MATRIX matrix){
+#endif
+    LIBXW_DATANODE *headnode = NULL, *cur_ptr = NULL, *prev_ptr = NULL;
+    int ret = 0;
+
+    ret = matrix_clear_items(matrix);
+    if (ret != EXIT_SUCCESS){
+        return ret;
+    }
+
+    headnode = (LIBXW_DATANODE *)matrix;
+
+    /* clean the column heads */
+    for (cur_ptr = headnode->next, prev_ptr = headnode; cur_ptr != headnode; cur_ptr = cur_ptr->next){
+        if ((prev_ptr->datatype & 0xFF00) != NODE_HEADNODE_CLINK){
+            put_datanode_into_spare(GLOBAL_BLOCK_TABLE, prev_ptr);  
+        }
+        prev_ptr = cur_ptr;
+    }
+    if ((prev_ptr->datatype & 0xFF00) != NODE_HEADNODE_CLINK){
+        put_datanode_into_spare(GLOBAL_BLOCK_TABLE, prev_ptr);
+    }
+
+    /* clean the row heads */
+    for (cur_ptr = headnode->prev, prev_ptr = headnode; cur_ptr != headnode; cur_ptr = cur_ptr->prev){
+        if ((prev_ptr->datatype & 0xFF00) != NODE_HEADNODE_CLINK){
+            put_datanode_into_spare(GLOBAL_BLOCK_TABLE, prev_ptr);
+        }
+        prev_ptr = cur_ptr;
+    }
+    if ((prev_ptr->datatype & 0xFF00) != NODE_HEADNODE_CLINK){
+        put_datanode_into_spare(GLOBAL_BLOCK_TABLE, prev_ptr);
+    }
+
+    /* clean the matrix head */
+    put_datanode_into_spare(GLOBAL_BLOCK_TABLE, headnode);
+
+    return EXIT_SUCCESS;
+}
 
 #ifdef __cplusplus    /* If used by C++ code, */ 
 }
