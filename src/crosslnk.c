@@ -97,7 +97,7 @@ LIBXW_MANAGED_MATRIX matrix_create(LIBXW_VALUE_TYPE value_type, int col_count, i
 
 static LIBXW_DATANODE * matrix_lookup_item(LIBXW_DATANODE * matrix_head, int column, int row){
     LIBXW_DATANODE *cur_ptr = NULL, *flag_ptr = NULL;
-    int i = 0, flag_walk = 0;
+    int i = 0;
 
     if (INTEGER_VALUE(matrix_head) == 0){
         return NULL;
@@ -110,9 +110,7 @@ static LIBXW_DATANODE * matrix_lookup_item(LIBXW_DATANODE * matrix_head, int col
                 return NULL;
             }
 
-            for (; cur_ptr != flag_ptr || flag_walk == 0; cur_ptr = cur_ptr->prev){
-                if (flag_walk != 1) flag_walk = 1;
-
+            for (cur_ptr = flag_ptr->prev; cur_ptr != flag_ptr; cur_ptr = cur_ptr->prev){
                 if (cur_ptr != flag_ptr){
                     if (cur_ptr->ext.extrec[EXT_ROW_INDEX] == row){
                         return cur_ptr;
@@ -133,7 +131,7 @@ int matrix_set_item(LIBXW_MANAGED_MATRIX matrix, LIBXW_VALUE_TYPE value_type, vo
     int column, int row){
 #endif
     LIBXW_DATANODE *headnode = NULL, *newnode = NULL, *prev_ptr = NULL, *cur_ptr = NULL, *flag_ptr = NULL;
-    int i = 0, flag_newadd = 0, flag_walk = 0;
+    int i = 0, flag_newadd = 0;
 
     if (matrix == NULL) return LIBXW_ERRNO_NULLOBJECT;
 
@@ -169,8 +167,7 @@ int matrix_set_item(LIBXW_MANAGED_MATRIX matrix, LIBXW_VALUE_TYPE value_type, vo
                 flag_newadd = 1;
             }
             else{
-                for (prev_ptr = flag_ptr; cur_ptr != flag_ptr || flag_walk == 0; cur_ptr = cur_ptr->prev){
-                    if (flag_walk != 1) flag_walk = 1;
+                for (prev_ptr = flag_ptr, cur_ptr = flag_ptr->prev; cur_ptr != flag_ptr; cur_ptr = cur_ptr->prev){
 
                     if (cur_ptr != flag_ptr){
                         if (cur_ptr->ext.extrec[EXT_ROW_INDEX] > row){
@@ -178,7 +175,6 @@ int matrix_set_item(LIBXW_MANAGED_MATRIX matrix, LIBXW_VALUE_TYPE value_type, vo
                             newnode->prev = cur_ptr;
                             prev_ptr->prev = newnode;
                             flag_newadd = 1;
-                            flag_walk = 0;
                             break;
                         }
                         else if (cur_ptr->ext.extrec[EXT_ROW_INDEX] == row){    /* specified [col, row] already exists. */
@@ -192,7 +188,6 @@ int matrix_set_item(LIBXW_MANAGED_MATRIX matrix, LIBXW_VALUE_TYPE value_type, vo
                     }
                     prev_ptr = cur_ptr;
                 }
-                flag_walk = 0;
 
                 if (prev_ptr->prev == cur_ptr){
                     INTEGER_VALUE(flag_ptr) += 1;
@@ -217,15 +212,12 @@ int matrix_set_item(LIBXW_MANAGED_MATRIX matrix, LIBXW_VALUE_TYPE value_type, vo
                     flag_ptr->next = newnode;
                 }
                 else{
-                    for (prev_ptr = flag_ptr; cur_ptr != flag_ptr || flag_walk == 0; cur_ptr = cur_ptr->next){
-                        if (flag_walk != 1) flag_walk = 1;
-
+                    for (prev_ptr = flag_ptr, cur_ptr = flag_ptr->next; cur_ptr != flag_ptr; cur_ptr = cur_ptr->next){
                         if (cur_ptr != flag_ptr){
                             if (cur_ptr->ext.extrec[EXT_COL_INDEX] > column){
                                 INTEGER_VALUE(flag_ptr) += 1;
                                 newnode->next = cur_ptr;
                                 prev_ptr->next = newnode;
-                                flag_walk = 0;
                                 break;
                             }
                             else if (cur_ptr->ext.extrec[EXT_COL_INDEX] == column){
@@ -237,7 +229,6 @@ int matrix_set_item(LIBXW_MANAGED_MATRIX matrix, LIBXW_VALUE_TYPE value_type, vo
                         }
                         prev_ptr = cur_ptr;
                     }
-                    flag_walk = 0;
 
                     if (prev_ptr->next == cur_ptr){
                         INTEGER_VALUE(flag_ptr) += 1;
@@ -334,7 +325,6 @@ int matrix_count_items(LIBXW_MANAGED_MATRIX matrix){
     return INTEGER_VALUE(headnode);
 }
 
-/* TODO: matrix_clean_item() and matrix_dispose() */
 #ifdef WIN32
 int __cdecl matrix_clear_items(LIBXW_MANAGED_MATRIX matrix){
 #else
