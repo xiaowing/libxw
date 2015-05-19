@@ -21,13 +21,10 @@ Build environment:
 Build steps:
 
 1. Compile the source.
-```
-    $make
-```
-	
 2. Install the binary.
 
 ```
+    $make
     $make install
 ```
 
