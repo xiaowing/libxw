@@ -21,12 +21,15 @@ Build environment:
 Build steps:
 
 1. Compile the source.
-
+```
     $make
+```
 	
 2. Install the binary.
 
+```
     $make install
+```
 
 The binary will be copied to /usr/lib(/usr/lib/libxw.so) and the header will be copied to /usr/include(/usr/include/libxw.h /usr/include/libxwdef.h).
 
@@ -46,7 +49,8 @@ If you want to run the test code, the following steps will be needed.
 1. Install CUnit. Please refer to [CUnit Home](http://cunit.sourceforge.net/).
 2. Compile the test program.
 
+```
     $make test
-
+```
 
   
