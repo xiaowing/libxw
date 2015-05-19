@@ -17,10 +17,11 @@ Build environment:
 * python(2.5+)
 
 Build steps:
+
 1. Compile the source.
-		$make
+    $make
 2. Install the binary.
-		$make install
+    $make install
 
 The binary will be copied to /usr/lib(/usr/lib/libxw.so) and the header will be copied to /usr/include(/usr/include/libxw.h /usr/include/libxwdef.h).
 
@@ -29,9 +30,9 @@ The test code of libxw was written under the assumption that the test code would
 However, no distribution of cunit will be delivered with the source code due to the issue of license.
 If you want to run the test code, the following steps will be needed.
 
-1. Install CUnit. Please refer to [http://cunit.sourceforge.net/ "CUnit Home"].
+1. Install CUnit. Please refer to [CUnit Home](http://cunit.sourceforge.net/).
 2. Compile the test program.
-		$make test
+    $make test
 
 
   
