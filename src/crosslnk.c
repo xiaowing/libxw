@@ -275,7 +275,7 @@ int matrix_get_item(LIBXW_MANAGED_MATRIX matrix, LIBXW_VALUE_TYPE value_type, vo
 #ifdef WIN32
 int __cdecl matrix_delete_item(LIBXW_MANAGED_MATRIX matrix, int column, int row){
 #else
-int matrix_get_item(LIBXW_MANAGED_MATRIX matrix, int column, int row){
+int matrix_delete_item(LIBXW_MANAGED_MATRIX matrix, int column, int row){
 #endif
     LIBXW_DATANODE *headnode = NULL, *result_ptr = NULL, *cur_ptr = NULL;
 
