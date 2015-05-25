@@ -131,7 +131,7 @@ int matrix_set_item(LIBXW_MANAGED_MATRIX matrix, LIBXW_VALUE_TYPE value_type, vo
     int column, int row){
 #endif
     LIBXW_DATANODE *headnode = NULL, *newnode = NULL, *prev_ptr = NULL, *cur_ptr = NULL, *flag_ptr = NULL;
-    int i = 0, flag_newadd = 0;
+    int i = 0;
 
     if (matrix == NULL) return LIBXW_ERRNO_NULLOBJECT;
 
@@ -148,65 +148,58 @@ int matrix_set_item(LIBXW_MANAGED_MATRIX matrix, LIBXW_VALUE_TYPE value_type, vo
     if (((headnode->datatype & NODE_HEADNODE_CLINK) == 0) || ((headnode->datatype & 0xFF) != value_type))
         return LIBXW_ERRNO_INVALID_NODETYPE;
 
-    newnode = get_next_available_node(GLOBAL_BLOCK_TABLE);
-    if (newnode == NULL){
-        exit(EXIT_PROCESS_DEBUG_EVENT);
+    /* First, look up if the specified item existed. */
+    if ((newnode = matrix_lookup_item(headnode, column, row)) != NULL){
+        /* overwrite the existing node.*/
+        return set_datanode_value(newnode, value_type, value_ptr, value_len);
     }
-    set_datanode_value(newnode, value_type, value_ptr, value_len);
-    newnode->ext.extrec[EXT_COL_INDEX] = column;
-    newnode->ext.extrec[EXT_ROW_INDEX] = row;
-    
-    /* TODO: refactor the following code to cut the use of the variable flag_newadd */
-    for (cur_ptr = headnode, i = -1; i <= column; cur_ptr = cur_ptr->next, i++){
-        if (i == column){
-            flag_ptr = cur_ptr;
-            if (cur_ptr->prev == flag_ptr){          /* no item yet */
-                INTEGER_VALUE(flag_ptr) += 1;
-                newnode->prev = flag_ptr;
-                flag_ptr->prev = newnode;
-                flag_newadd = 1;
-            }
-            else{
-                for (prev_ptr = flag_ptr, cur_ptr = flag_ptr->prev; cur_ptr != flag_ptr; cur_ptr = cur_ptr->prev){
-
-                    if (cur_ptr != flag_ptr){
-                        if (cur_ptr->ext.extrec[EXT_ROW_INDEX] > row){
-                            INTEGER_VALUE(flag_ptr) += 1;
-                            newnode->prev = cur_ptr;
-                            prev_ptr->prev = newnode;
-                            flag_newadd = 1;
-                            break;
-                        }
-                        else if (cur_ptr->ext.extrec[EXT_ROW_INDEX] == row){    /* specified [col, row] already exists. */
-                            /* overwrite the existing node.*/
-                            return set_datanode_value(cur_ptr, value_type, value_ptr, value_len);
-                            /* QUESTION: does the caller of matrix_set_item() need to know whether the overwrite happened ? */
-                        }
-                        else{
-                            ;;
-                        }
-                    }
-                    prev_ptr = cur_ptr;
-                }
-
-                if (prev_ptr->prev == cur_ptr){
-                    INTEGER_VALUE(flag_ptr) += 1;
-                    newnode->prev = cur_ptr;
-                    prev_ptr->prev = newnode;
-                    flag_newadd = 1;
-                }
-            }
-            break;
+    else{
+        newnode = get_next_available_node(GLOBAL_BLOCK_TABLE);
+        if (newnode == NULL){
+            exit(EXIT_PROCESS_DEBUG_EVENT);
         }
-    }
+        set_datanode_value(newnode, value_type, value_ptr, value_len);
+        newnode->ext.extrec[EXT_COL_INDEX] = column;
+        newnode->ext.extrec[EXT_ROW_INDEX] = row;
 
-    if (flag_newadd == 1){       /* in the condition that new node added*/
+        for (cur_ptr = headnode, i = -1; i <= column; cur_ptr = cur_ptr->next, i++){
+            if (i == column){
+                flag_ptr = cur_ptr;
+                if (cur_ptr->prev == flag_ptr){          /* no item yet */
+                    INTEGER_VALUE(flag_ptr) += 1;
+                    newnode->prev = flag_ptr;
+                    flag_ptr->prev = newnode;
+                }
+                else{
+                    for (prev_ptr = flag_ptr, cur_ptr = flag_ptr->prev; cur_ptr != flag_ptr; cur_ptr = cur_ptr->prev){
+
+                        if (cur_ptr != flag_ptr){
+                            if (cur_ptr->ext.extrec[EXT_ROW_INDEX] > row){
+                                INTEGER_VALUE(flag_ptr) += 1;
+                                newnode->prev = cur_ptr;
+                                prev_ptr->prev = newnode;
+                                break;
+                            }
+                        }
+                        prev_ptr = cur_ptr;
+                    }
+
+                    if (prev_ptr->prev == cur_ptr){
+                        INTEGER_VALUE(flag_ptr) += 1;
+                        newnode->prev = cur_ptr;
+                        prev_ptr->prev = newnode;
+                    }
+                }
+                break;
+            }
+        }
+
         INTEGER_VALUE(headnode) += 1;
 
         for (cur_ptr = headnode, i = -1; i <= row; cur_ptr = cur_ptr->prev, i++){
             if (i == row){
                 flag_ptr = cur_ptr;
-                if (cur_ptr->next == flag_ptr){          
+                if (cur_ptr->next == flag_ptr){
                     INTEGER_VALUE(flag_ptr) += 1;
                     newnode->next = flag_ptr;
                     flag_ptr->next = newnode;
@@ -342,11 +335,6 @@ int matrix_clear_items(LIBXW_MANAGED_MATRIX matrix){
             if ((flag_ptr->datatype & 0xFF00) == NODE_HEADNODE_CLINK) continue;
 
             for (cur_ptr = flag_ptr->prev, prev_ptr = flag_ptr; cur_ptr != flag_ptr; cur_ptr = cur_ptr->prev){
-                /* if (cur_ptr->datatype & 0xFF00 == NODE_HEADNODE_CLINK_COLHEAD) {
-                    prev_ptr = cur_ptr;
-                    continue;
-                } */
-
                 if ((prev_ptr->datatype & 0xFF00) != NODE_HEADNODE_CLINK_COLHEAD){
                     put_datanode_into_spare(GLOBAL_BLOCK_TABLE, prev_ptr);
                     
