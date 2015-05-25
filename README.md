@@ -1,12 +1,14 @@
 libxw
 =============
 ###Summary 
-A C-language library contains several utility functions and an implementation of Stack and Queue based a lightweight memory management.
+A C-language library contains several utility functions and an implementation of Stack, Queue and Matrix based on a lightweight memory management.
 
 Currently this library contains the following content.
 
 1. Data structure of an implementation of stack and a set of functions to use the stack.
-2. A set of utilities to deal with the C-style string(which ends with '\0'). Such as trim and reverse.
+2. Data structure of an implementation of queue and a set of functions to use the queue.
+3. Data structure of an implementation of matrix (based on the implementation of cross linked list) and a set of functions to use the matrix.
+4. A set of utilities to deal with the C-style string(which ends with '\0'). Such as trim and reverse.
 
 ###API references
 ~(under construction)~
@@ -46,8 +48,13 @@ If you want to run the test code, the following steps will be needed.
 1. Install CUnit. Please refer to [CUnit Home](http://cunit.sourceforge.net/).
 2. Compile the test program.
 
+####Linux
+
 ```
     $make test
 ```
+
+####Windows
+* Use the Visual Studio to build the test program.
 
   
