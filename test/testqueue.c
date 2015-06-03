@@ -11,6 +11,11 @@
 
 extern int suite_success_init(void);
 extern int suite_success_clean(void);
+#ifdef WIN32
+extern void test_multi_threads(LPTHREAD_START_ROUTINE);
+#else
+extern void test_multi_threads(single_thread_ptr);
+#endif
 
 void test_queue_basic(void){
     int foo = 12048, bar = 2048;
@@ -69,32 +74,7 @@ static void* ThreadExec(void* arg){
 }
 
 void test_queues_multi_threads(void){
-    int i = 0;
-#ifdef WIN32
-    HANDLE handles[THREAD_NUM];
-#else
-    pthread_t handles[THREAD_NUM];
-#endif
-
-#ifndef WIN32
-    pthread_setconcurrency(THREAD_NUM);
-#endif   
-
-    for (i = 0; i < THREAD_NUM; i++){
-#ifdef WIN32
-        handles[i] = CreateThread(NULL, 0, ThreadExec, NULL, 0, NULL);
-#else
-        pthread_create(&handles[i], NULL, ThreadExec, NULL);
-#endif
-    }
-
-#ifdef WIN32
-    WaitForMultipleObjects(THREAD_NUM, handles, TRUE, INFINITE);
-#else
-    for (i = 0; i < THREAD_NUM; i++){
-        pthread_join(handles[i], NULL);
-    }
-#endif
+    test_multi_threads(ThreadExec);
 }
 
 static CU_TestInfo testcase[] = {

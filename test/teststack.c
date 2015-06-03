@@ -19,6 +19,10 @@ typedef struct testtype{
     double bar;
 } TestType;
 
+#ifndef WIN32
+typedef void* (* single_thread_ptr)(void* arg);
+#endif
+
 void test_stack_basic(void){
     int foo = 12048, bar = 2048;
     int tmp = 0, size = 0;
@@ -117,7 +121,11 @@ int ThreadExecSingle(void* pM){
     return 0;
 }
 
-void test_stacks_multi_threads(void){
+#ifdef WIN32
+void test_multi_threads(LPTHREAD_START_ROUTINE func){
+#else
+void test_multi_threads(single_thread_ptr func){
+#endif
     int i = 0;
 #ifdef WIN32
     HANDLE handles[THREAD_NUM];
@@ -131,9 +139,9 @@ void test_stacks_multi_threads(void){
 
     for (i = 0; i < THREAD_NUM; i++){
 #ifdef WIN32
-        handles[i] = CreateThread(NULL, 0, ThreadExec, NULL, 0, NULL);
+        handles[i] = CreateThread(NULL, 0, func, NULL, 0, NULL);
 #else
-        pthread_create(&handles[i], NULL, ThreadExec, NULL);
+        pthread_create(&handles[i], NULL, func, NULL);
 #endif
     }
 
@@ -144,6 +152,10 @@ void test_stacks_multi_threads(void){
         pthread_join(handles[i], NULL);
     }
 #endif
+}
+
+void test_stacks_multi_threads(void){
+    test_multi_threads(ThreadExec);
 }
 
 void test_stacks_single_threads(void){
