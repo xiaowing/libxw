@@ -171,31 +171,33 @@ _nodespeek_body(nodetype, a, b, c, d)
 
 
 /* The declearation of the interfaces. */
-int convstr(char *);
-int trimstr(char *);
+int convstr(char * str);
+int trimstr(char * str);
 
-LIBXW_MANAGED_STACK stack_create(LIBXW_VALUE_TYPE);
-int stack_dispose(LIBXW_MANAGED_STACK);
-int stack_clear(LIBXW_MANAGED_STACK);
-int stack_count(LIBXW_MANAGED_STACK);
-int stack_peek(LIBXW_MANAGED_STACK, LIBXW_VALUE_TYPE, void *, int *);
-int stack_pop(LIBXW_MANAGED_STACK, LIBXW_VALUE_TYPE, void *, int *);
-int stack_push(LIBXW_MANAGED_STACK, LIBXW_VALUE_TYPE, void *, int);
+LIBXW_MANAGED_STACK stack_create(LIBXW_VALUE_TYPE value_type);
+int stack_dispose(LIBXW_MANAGED_STACK stack);
+int stack_clear(LIBXW_MANAGED_STACK stack);
+int stack_count(LIBXW_MANAGED_STACK stack);
+int stack_peek(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void * value_ptr, int * value_len_buf);
+int stack_pop(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void * value_ptr, int * value_len_buf);
+int stack_push(LIBXW_MANAGED_STACK stack, LIBXW_VALUE_TYPE value_type, void * value_ptr, int value_len);
 
-LIBXW_MANAGED_QUEUE queue_create(LIBXW_VALUE_TYPE);
-int queue_dispose(LIBXW_MANAGED_QUEUE);
-int queue_clear(LIBXW_MANAGED_QUEUE);
-int queue_count(LIBXW_MANAGED_QUEUE);
-int queue_peek(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int *);
-int queue_enqueue(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int);
-int queue_dequeue(LIBXW_MANAGED_QUEUE, LIBXW_VALUE_TYPE, void *, int *);
+LIBXW_MANAGED_QUEUE queue_create(LIBXW_VALUE_TYPE value_type);
+int queue_dispose(LIBXW_MANAGED_QUEUE queue);
+int queue_clear(LIBXW_MANAGED_QUEUE queue);
+int queue_count(LIBXW_MANAGED_QUEUE queue);
+int queue_peek(LIBXW_MANAGED_QUEUE queue, LIBXW_VALUE_TYPE value_type, void * value_ptr, int * value_len_buf);
+int queue_enqueue(LIBXW_MANAGED_QUEUE queue, LIBXW_VALUE_TYPE value_type, void * value_ptr, int value_len);
+int queue_dequeue(LIBXW_MANAGED_QUEUE queue, LIBXW_VALUE_TYPE value_type, void * value_ptr, int * value_len_buf);
 
-LIBXW_MANAGED_MATRIX matrix_create(LIBXW_VALUE_TYPE, int, int);
-int matrix_set_item(LIBXW_MANAGED_MATRIX, LIBXW_VALUE_TYPE, void *, int, int, int);
-int matrix_get_item(LIBXW_MANAGED_MATRIX, LIBXW_VALUE_TYPE, void *, int *, int column, int row);
-int matrix_delete_item(LIBXW_MANAGED_MATRIX, int, int);
-int matrix_count_items(LIBXW_MANAGED_MATRIX);
-int matrix_clear_items(LIBXW_MANAGED_MATRIX);
-int matrix_dispose(LIBXW_MANAGED_MATRIX);
+LIBXW_MANAGED_MATRIX matrix_create(LIBXW_VALUE_TYPE value_type, int col_count, int row_count);
+int matrix_set_item(LIBXW_MANAGED_MATRIX matrix, LIBXW_VALUE_TYPE value_type, void * value_ptr, int value_len, 
+    int column_index, int row_index);
+int matrix_get_item(LIBXW_MANAGED_MATRIX matrix, LIBXW_VALUE_TYPE value_type, void * value_ptr, int * value_len_buf, 
+    int column_index, int row_index);
+int matrix_delete_item(LIBXW_MANAGED_MATRIX matrix, int column_index, int row_index);
+int matrix_count_items(LIBXW_MANAGED_MATRIX matrix);
+int matrix_clear_items(LIBXW_MANAGED_MATRIX matrix);
+int matrix_dispose(LIBXW_MANAGED_MATRIX matrix);
 
 #endif
