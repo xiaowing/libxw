@@ -13,6 +13,12 @@
 extern int suite_success_init(void);
 extern int suite_success_clean(void);
 
+#ifdef WIN32
+extern void test_multi_threads(LPTHREAD_START_ROUTINE);
+#else
+extern void test_multi_threads(single_thread_ptr);
+#endif
+
 void test_matrix_basic(void){
     int foo = 12048, bar = 2048;
     int tmp = 0, size = 0;
@@ -87,8 +93,51 @@ void test_matrix_basic(void){
     matrix_dispose(matrix3);
 }
 
+#ifdef WIN32
+static DWORD __stdcall ThreadExec(LPVOID pM){
+#else
+static void* ThreadExec(void* arg){
+#endif
+    LIBXW_MANAGED_QUEUE matrix = NULL;
+    int r = 0, mod = 0, rad = 0, popval = 0, size = 0, current_thread_no = 0, i = 0;
+    int indexs[QUEUE_LENGTH][3] = { 0 };
+
+    srand((unsigned)time(NULL));
+    do{
+        mod = rand() % 10;
+    } while (mod < 3);
+    matrix = matrix_create(NODE_VALUE_INTEGER, mod, mod);
+
+    srand((unsigned)time(NULL));    /* set randam seed */
+    for (i = 0; i < QUEUE_LENGTH; i++){
+        r = rand();
+        indexs[i][0] = r % mod;
+        r = rand();
+        indexs[i][1] = r % mod;
+        r = rand();
+        indexs[i][2] = r;
+
+        matrix_set_item(matrix, NODE_VALUE_INTEGER, &r, sizeof(int), indexs[i][0], indexs[i][1]);
+    }
+
+    for (i = 0; i < QUEUE_LENGTH; i++){
+        matrix_get_item(matrix, NODE_VALUE_INTEGER, &popval, &size, indexs[i][0], indexs[i][1]);
+        CU_ASSERT_EQUAL(popval, indexs[i][2]);
+    }
+
+    /* dispose the matrix. */
+    matrix_dispose(matrix);
+    return 0;
+}
+
+void test_matrix_multi_threads(void){
+    /* TODO: the case fails occasionally, still don't know why. */
+    test_multi_threads(ThreadExec);
+}
+
 static CU_TestInfo testcase[] = {
     { "test_matrix_basic:", test_matrix_basic },
+    { "test_matrix_multi_threads", test_matrix_multi_threads },
     CU_TEST_INFO_NULL
 };
 
