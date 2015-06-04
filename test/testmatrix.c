@@ -99,7 +99,7 @@ static DWORD __stdcall ThreadExec(LPVOID pM){
 static void* ThreadExec(void* arg){
 #endif
     LIBXW_MANAGED_QUEUE matrix = NULL;
-    int r = 0, mod = 0, rad = 0, popval = 0, size = 0, current_thread_no = 0, i = 0;
+    int r = 0, mod = 0, rad = 0, popval = 0, size = 0, col = 0, row = 0, i = 0, j = 0;
     int indexs[QUEUE_LENGTH][3] = { 0 };
 
     srand((unsigned)time(NULL));
@@ -110,10 +110,20 @@ static void* ThreadExec(void* arg){
 
     srand((unsigned)time(NULL));    /* set randam seed */
     for (i = 0; i < QUEUE_LENGTH; i++){
+    dice:
         r = rand();
-        indexs[i][0] = r % mod;
+        col = r % mod;
         r = rand();
-        indexs[i][1] = r % mod;
+        row = r % mod;
+
+        for (j = 0; j < i; j++){
+            if ((indexs[j][0] == col) && (indexs[j][1] == row)){
+                goto dice;
+            }
+        }
+
+        indexs[i][0] = col;
+        indexs[i][1] = row;
         r = rand();
         indexs[i][2] = r;
 
