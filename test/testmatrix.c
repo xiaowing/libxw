@@ -81,6 +81,17 @@ void test_matrix_basic(void){
 
     CU_ASSERT_EQUAL(matrix_set_item(matrix2, NODE_VALUE_CSTRING, string6, strlen(string6), 5, 5),
         LIBXW_ERRNO_COLINDEX_OUTRANGE);
+
+    /* add the tests of matrix_delete_item() */
+    matrix_delete_item(matrix2, 0, 0);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix2), 6);
+    matrix_delete_item(matrix2, 4, 4);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix2), 5);
+    matrix_delete_item(matrix2, 3, 1);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix2), 4);
+
+
+
     matrix_clear_items(matrix2);
     CU_ASSERT_EQUAL(matrix_count_items(matrix2), 0);
     matrix_dispose(matrix2);
