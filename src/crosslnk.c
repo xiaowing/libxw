@@ -289,6 +289,9 @@ int matrix_delete_item(LIBXW_MANAGED_MATRIX matrix, int column, int row){
             INTEGER_VALUE(cur_ptr) -= 1;
         }
     }
+    if ((cur_ptr->datatype & 0xFF00) == NODE_HEADNODE_CLINK_ROWHEAD){
+        INTEGER_VALUE(cur_ptr) -= 1;
+    }
     cur_ptr->next = result_ptr->next;
     result_ptr->next = NULL;
 
@@ -296,6 +299,9 @@ int matrix_delete_item(LIBXW_MANAGED_MATRIX matrix, int column, int row){
         if ((cur_ptr->datatype & 0xFF00) == NODE_HEADNODE_CLINK_COLHEAD){
             INTEGER_VALUE(cur_ptr) -= 1;
         }
+    }
+    if ((cur_ptr->datatype & 0xFF00) == NODE_HEADNODE_CLINK_COLHEAD){
+        INTEGER_VALUE(cur_ptr) -= 1;
     }
     cur_ptr->prev = result_ptr->prev;
     result_ptr->prev = NULL;
