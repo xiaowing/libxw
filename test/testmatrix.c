@@ -141,13 +141,78 @@ static void* ThreadExec(void* arg){
 }
 
 void test_matrix_multi_threads(void){
-    /* TODO: the case fails occasionally, still don't know why. */
     test_multi_threads(ThreadExec);
+}
+
+void test_matrix_resize(void){
+    char buf[32] = { 0x00 };
+    char * string1 = "this is matrix[0, 0].\n";
+    char * string2 = "[1, 1], done.\n";
+    char * string3 = "hello, [2, 0].\n";
+    char * string4 = "[3, 1] get ready.\n";
+    char * string5 = "acknowledge, [2, 4].\n";
+    char * string6 = "weclome to [4, 4].\n";
+    char * string7 = "there may be a bug. [2, 2].\n";
+    char * string8 = "a bug may lie here. [2, 3].\n";
+    int ret = 0, size = 0;
+
+    LIBXW_MANAGED_MATRIX matrix = NULL;
+
+    matrix = matrix_create(NODE_VALUE_CSTRING, 3, 2);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 0);
+
+    matrix_set_item(matrix, NODE_VALUE_CSTRING, string1, strlen(string1), 0, 0);    /* +1 */
+    matrix_set_item(matrix, NODE_VALUE_CSTRING, string2, strlen(string2), 1, 1);    /* +1 */
+    matrix_set_item(matrix, NODE_VALUE_CSTRING, string3, strlen(string3), 2, 0);    /* +1 */
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 3);
+
+    ret = matrix_set_item(matrix, NODE_VALUE_CSTRING, string5, strlen(string5), 2, 4);
+    CU_ASSERT_EQUAL(ret, LIBXW_ERRNO_ROWINDEX_OUTRANGE);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 3);
+
+    matrix_resize(matrix, 5, 5, BOOLEAN_FALSE);
+    matrix_set_item(matrix, NODE_VALUE_CSTRING, string5, strlen(string5), 2, 4);    /* +1 */
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 4);
+    matrix_get_item(matrix, NODE_VALUE_CSTRING, &buf, &size, 2, 4);
+    CU_ASSERT_NSTRING_EQUAL(buf, string5, size);
+
+    matrix_set_item(matrix, NODE_VALUE_CSTRING, string6, strlen(string6), 4, 4);    /* +1 */
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 5);
+    matrix_get_item(matrix, NODE_VALUE_CSTRING, &buf, &size, 4, 4);
+    CU_ASSERT_NSTRING_EQUAL(buf, string6, size);
+    matrix_get_item(matrix, NODE_VALUE_CSTRING, &buf, &size, 0, 0);
+    CU_ASSERT_NSTRING_EQUAL(buf, string1, size);
+
+    ret = matrix_resize(matrix, 2, 1, BOOLEAN_FALSE);                               
+    CU_ASSERT_EQUAL(ret, LIBXW_ERRNO_INVALIDOPRATION);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 5);
+
+    matrix_resize(matrix, 3, 2, BOOLEAN_TRUE);                                      /* -2 */
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 3);
+
+    matrix_resize(matrix, 4, 1, BOOLEAN_TRUE);                                      /* -1 */
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 2);
+    matrix_set_item(matrix, NODE_VALUE_CSTRING, string8, strlen(string8), 1, 0);    /* +1 */
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 3);
+    matrix_get_item(matrix, NODE_VALUE_CSTRING, &buf, &size, 1, 0);
+    CU_ASSERT_NSTRING_EQUAL(buf, string8, size);
+
+    matrix_resize(matrix, 2, 1, BOOLEAN_TRUE);                                      /* -1 */
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 2);
+    matrix_get_item(matrix, NODE_VALUE_CSTRING, &buf, &size, 0, 0);
+    CU_ASSERT_NSTRING_EQUAL(buf, string1, size);
+    ret = matrix_set_item(matrix, NODE_VALUE_CSTRING, string3, strlen(string3), 2, 0);
+    CU_ASSERT_EQUAL(ret, LIBXW_ERRNO_COLINDEX_OUTRANGE);
+    matrix_set_item(matrix, NODE_VALUE_CSTRING, string7, strlen(string7), 1, 0);
+    CU_ASSERT_EQUAL(matrix_count_items(matrix), 2);
+    matrix_get_item(matrix, NODE_VALUE_CSTRING, &buf, &size, 1, 0);
+    CU_ASSERT_NSTRING_EQUAL(buf, string7, size);
 }
 
 static CU_TestInfo testcase[] = {
     { "test_matrix_basic:", test_matrix_basic },
     { "test_matrix_multi_threads", test_matrix_multi_threads },
+    { "test_matrix_resize", test_matrix_resize },
     CU_TEST_INFO_NULL
 };
 

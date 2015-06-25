@@ -21,5 +21,6 @@ EXPORTS
 	matrix_get_item
 	matrix_delete_item
 	matrix_count_items
+	matrix_resize
 	matrix_clear_items
 	matrix_dispose

@@ -412,6 +412,190 @@ int matrix_dispose(LIBXW_MANAGED_MATRIX matrix){
     return EXIT_SUCCESS;
 }
 
+#ifdef WIN32
+int __cdecl matrix_resize(LIBXW_MANAGED_MATRIX matrix, int new_col, int new_row, LIBXW_BOOLEAN isforced){
+#else
+int matrix_resize(LIBXW_MANAGED_MATRIX matrix, int new_col, int new_row, LIBXW_BOOLEAN isforced){
+#endif
+    LIBXW_DATANODE *headnode = NULL, *curnode = NULL, *new_headnode = NULL, *prevnode = NULL, 
+        *delete_node = NULL, *walk_node = NULL, *reset_node = NULL;
+    int col_idx = 0, row_idx = 0;
+    LIBXW_VALUE_TYPE value_type;
+
+    if (matrix == NULL) return LIBXW_ERRNO_NULLOBJECT;
+
+    headnode = (LIBXW_DATANODE *)matrix;
+    if (!(headnode->datatype & NODE_HEADNODE_CLINK)) return LIBXW_ERRNO_INVALID_NODETYPE;
+
+    if (isforced == BOOLEAN_FALSE){
+        for (curnode = headnode->next;
+            curnode != headnode;
+            curnode = curnode->next){
+            if (curnode->ext.extrec[EXT_COL_INDEX] >= new_col){
+                if (INTEGER_VALUE(curnode) > 0){
+                    return LIBXW_ERRNO_INVALIDOPRATION;
+                }
+            }
+        }
+
+        for (curnode = headnode->prev;
+            curnode != headnode;
+            curnode = curnode->prev){
+            if (curnode->ext.extrec[EXT_ROW_INDEX] >= new_row){
+                if (INTEGER_VALUE(curnode) > 0){
+                    return LIBXW_ERRNO_INVALIDOPRATION;
+                }
+            }
+        }
+    }
+
+    value_type = headnode->datatype ^ NODE_HEADNODE_CLINK;
+
+    if (new_col > headnode->ext.extrec[EXT_COL_INDEX]){
+        /* Add new colomns */
+        for (curnode = headnode, col_idx = -1; 
+            ((curnode->next != headnode) && (col_idx < headnode->ext.extrec[EXT_COL_INDEX]));
+            curnode = curnode->next, col_idx++){
+            ;;
+        }
+        if (curnode->ext.extrec[EXT_COL_INDEX] != col_idx){
+            exit(EXIT_PROCESS_DEBUG_EVENT);
+        }
+
+        for (col_idx += 1; col_idx < new_col; col_idx++){
+            new_headnode = get_next_available_node(GLOBAL_BLOCK_TABLE);
+            if (new_headnode == NULL){
+                exit(EXIT_PROCESS_DEBUG_EVENT);
+            }
+            new_headnode->datatype = NODE_HEADNODE_CLINK_COLHEAD | value_type;
+            new_headnode->ext.extrec[EXT_COL_INDEX] = col_idx;
+            INTEGER_VALUE(new_headnode) = 0;
+
+            curnode->next = new_headnode;              /* next pointer means right pointer here */
+            new_headnode->next = headnode;
+            curnode = curnode->next;                   /* move the current pointer*/
+            new_headnode->prev = new_headnode;         /* the down pointer should points to the column head itself during initialization*/
+        }
+        
+    }
+    else if (new_col < headnode->ext.extrec[EXT_COL_INDEX]){
+        /* Delete existing columns */
+
+        for (prevnode = headnode, curnode = headnode->next;
+            curnode != headnode;){
+            if (curnode->ext.extrec[EXT_COL_INDEX] >= new_col){
+                if (INTEGER_VALUE(curnode) > 0){
+                    for (delete_node = curnode, walk_node = curnode->prev; walk_node != curnode; ){
+                        delete_node = walk_node;
+                        walk_node = walk_node->prev;
+                        
+                        /* Make sure the relation of the row is alright after the delete_node being deleted. */
+                        for (reset_node = delete_node; reset_node->next != delete_node; reset_node = reset_node->next){
+                            if ((reset_node->datatype & 0xFF00) == NODE_HEADNODE_CLINK_ROWHEAD){
+                                INTEGER_VALUE(reset_node) -= 1;
+                            }
+                        }
+                        if ((reset_node->datatype & 0xFF00) == NODE_HEADNODE_CLINK_ROWHEAD){
+                            INTEGER_VALUE(reset_node) -= 1;
+                        }
+
+                        reset_node->next = delete_node->next;
+                        delete_node->next = NULL;
+                        INTEGER_VALUE(headnode) -= 1;
+                        put_datanode_into_spare(GLOBAL_BLOCK_TABLE, delete_node);
+                    }
+                    curnode->prev = curnode;
+                }
+
+                delete_node = curnode;
+                curnode = curnode->next;
+                prevnode->next = curnode;
+                put_datanode_into_spare(GLOBAL_BLOCK_TABLE, delete_node);
+            }
+            else{
+                prevnode = curnode;
+                curnode = curnode->next;
+            }
+        }
+    }
+    else{
+        ;;
+    }
+    headnode->ext.extrec[EXT_COL_INDEX] = new_col;
+
+    if (new_row > headnode->ext.extrec[EXT_ROW_INDEX]){
+        /* Add new rows */
+        for (curnode = headnode, row_idx = -1;
+            ((curnode->prev != headnode) && (row_idx < headnode->ext.extrec[EXT_ROW_INDEX]));
+            curnode = curnode->prev, row_idx++){
+            ;;
+        }
+        if (curnode->ext.extrec[EXT_ROW_INDEX] != row_idx){
+            exit(EXIT_PROCESS_DEBUG_EVENT);
+        }
+        for (row_idx += 1; row_idx < new_col; row_idx++){
+            new_headnode = get_next_available_node(GLOBAL_BLOCK_TABLE);
+            if (new_headnode == NULL){
+                exit(EXIT_PROCESS_DEBUG_EVENT);
+            }
+            new_headnode->datatype = NODE_HEADNODE_CLINK_ROWHEAD | value_type;
+            new_headnode->ext.extrec[EXT_ROW_INDEX] = row_idx;
+            INTEGER_VALUE(new_headnode) = 0;
+
+            curnode->prev = new_headnode;              /* next pointer means right pointer here */
+            new_headnode->prev = headnode;
+            curnode = curnode->prev;                   /* move the current pointer*/
+            new_headnode->next = new_headnode;         /* the down pointer should points to the column head itself during initialization*/
+        }
+    }
+    else if (new_row < headnode->ext.extrec[EXT_ROW_INDEX]){
+        /* Delete existing rows */
+        for (prevnode = headnode, curnode = headnode->prev;
+            curnode != headnode;){
+            if (curnode->ext.extrec[EXT_ROW_INDEX] >= new_row){
+                if (INTEGER_VALUE(curnode) > 0){
+                    for (delete_node = curnode, walk_node = curnode->next;
+                        walk_node != curnode;){
+                        delete_node = walk_node;
+                        walk_node = walk_node->next;
+                        
+                        /* Make sure the relation of the columns is alright after the delete_node being deleted. */
+                        for (reset_node = delete_node; reset_node->prev != delete_node; reset_node = reset_node->prev){ 
+                            if ((reset_node->datatype & 0xFF00) == NODE_HEADNODE_CLINK_COLHEAD){
+                                INTEGER_VALUE(reset_node) -= 1;
+                            }
+                        }
+                        if ((reset_node->datatype & 0xFF00) == NODE_HEADNODE_CLINK_COLHEAD){
+                            INTEGER_VALUE(reset_node) -= 1;
+                        }
+
+                        reset_node->prev = delete_node->prev;
+                        delete_node->prev = NULL;
+                        INTEGER_VALUE(headnode) -= 1;
+                        put_datanode_into_spare(GLOBAL_BLOCK_TABLE, delete_node);
+                    }
+                    curnode->next = curnode;
+                }
+
+                delete_node = curnode;
+                curnode = curnode->prev;
+                prevnode->prev = curnode;
+                put_datanode_into_spare(GLOBAL_BLOCK_TABLE, delete_node);
+            }
+            else{
+                prevnode = curnode;
+                curnode = curnode->prev;
+            }
+        }
+    }
+    else{
+        ;;
+    }
+    headnode->ext.extrec[EXT_ROW_INDEX] = new_row;
+
+    return EXIT_SUCCESS;
+}
+
 #ifdef __cplusplus    /* If used by C++ code, */ 
 }
 #endif

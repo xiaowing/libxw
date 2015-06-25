@@ -40,6 +40,12 @@ typedef enum  node_value_type{
     NODE_DATANODE_SPARE = 0x8000,
 }LIBXW_VALUE_TYPE;
 
+typedef enum enum_bool{
+    BOOLEAN_FALSE = 0x00,
+    BOOLEAN_TRUE  = 0x01,
+}LIBXW_BOOLEAN;
+
+
 #define _createnode_body(type, nodetype, a) \
 { \
     LIBXW_DATANODE *headnode = NULL; \
@@ -197,6 +203,7 @@ int matrix_get_item(LIBXW_MANAGED_MATRIX matrix, LIBXW_VALUE_TYPE value_type, vo
     int column_index, int row_index);
 int matrix_delete_item(LIBXW_MANAGED_MATRIX matrix, int column_index, int row_index);
 int matrix_count_items(LIBXW_MANAGED_MATRIX matrix);
+int matrix_resize(LIBXW_MANAGED_MATRIX matrix, int new_cols, int new_rows, LIBXW_BOOLEAN isforced);
 int matrix_clear_items(LIBXW_MANAGED_MATRIX matrix);
 int matrix_dispose(LIBXW_MANAGED_MATRIX matrix);
 
