@@ -316,12 +316,24 @@ int __cdecl matrix_count_items(LIBXW_MANAGED_MATRIX matrix){
 int matrix_count_items(LIBXW_MANAGED_MATRIX matrix){
 #endif
     LIBXW_DATANODE *headnode = NULL;
+#ifdef _DEBUG
+    LIBXW_DATANODE *flagnode = NULL, *curnode = NULL;
+    int count = 0;
+#endif
 
     if (matrix == NULL) return LIBXW_ERRNO_NULLOBJECT;
 
     headnode = (LIBXW_DATANODE *)matrix;
-
+#ifdef _DEBUG
+    for (flagnode = headnode->next; (flagnode != NULL) && (flagnode != headnode); flagnode = flagnode->next){
+        for (curnode = flagnode->prev; curnode != flagnode; curnode = curnode->prev){
+            count++;
+        }
+    }
+    return count;
+#else
     return INTEGER_VALUE(headnode);
+#endif
 }
 
 #ifdef WIN32

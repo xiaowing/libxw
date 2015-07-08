@@ -18,9 +18,6 @@ extern "C" {
 #endif
 
 /* Shortcut macro functions. */
-/* #define TOPPTR_VALUE(datanode_ptr)  \
-    (*((LIBXW_DATANODE **)(datanode_ptr->value))) */
-
 #define CSTRING_VALUE(datanode_ptr)  \
     (*((char **)(datanode_ptr->value)))
 
@@ -128,13 +125,6 @@ void put_node_into_rear(LIBXW_DATANODE* list, LIBXW_DATANODE* target){
         target->prev = last;
     }
 }
-
-/*static void put_node_into_front(LIBXW_DATANODE* list, LIBXW_DATANODE* target){
-    if (list != NULL){
-        target->next = list;
-        list->prev = target;
-    }
-}*/
 
 int set_datanode_value(LIBXW_DATANODE *newnode, LIBXW_VALUE_TYPE value_type, void *value_ptr, int value_len){
     switch (value_type){
