@@ -9,8 +9,10 @@ extern int suite_success_clean(void);
 
 void test_trimstr(void){
     char test_string[256] = { "   hello, world.\t" };
+    int ret = 0;
 
-    if (trimstr(test_string) > 0){
+    if ((ret = trimstr(test_string, 17)) > 0){
+        CU_ASSERT_EQUAL(ret, 13);
         CU_ASSERT_STRING_EQUAL(test_string, "hello, world.");
     }
 }
