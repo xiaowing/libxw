@@ -19,13 +19,14 @@ extern "C" {
 #endif
 
 #ifdef WIN32
-    int __cdecl trimstr(char * str){
+    int __cdecl trimstr(char * str, int len){
 #else
-    int trimstr(char * str){
+    int trimstr(char * str, int len){
 #endif
 
         char * tail = NULL;
         char * front = NULL;
+        int cnt = len;
 
         if (str == NULL){
             return -1;
@@ -36,13 +37,14 @@ extern "C" {
         }
 
 
-        tail = str + (strlen(str) - 1);
+        tail = str + (len - 1);
 
         /* right trim */
         while (*tail == 0x20 || *tail == 0x09
             || *tail == 0x0a || *tail == 0x0d)
         {
             tail--;
+            cnt--;
         }
         *(tail + 1) = 0;
 
@@ -52,6 +54,7 @@ extern "C" {
             || *front == 0x0a || *front == 0x0d)
         {
             front++;
+            cnt--;
         }
 
         tail = str;
@@ -63,7 +66,7 @@ extern "C" {
             *tail = 0;
         }
 
-        return 1;
+        return cnt;
     }
 
 #ifdef __cplusplus    // If used by C++ code, 

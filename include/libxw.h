@@ -178,7 +178,7 @@ _nodespeek_body(nodetype, a, b, c, d)
 
 /* The declearation of the interfaces. */
 int convstr(char * str);
-int trimstr(char * str);
+int trimstr(char * str, int len);
 
 LIBXW_MANAGED_STACK stack_create(LIBXW_VALUE_TYPE value_type);
 int stack_dispose(LIBXW_MANAGED_STACK stack);
