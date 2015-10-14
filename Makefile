@@ -29,7 +29,7 @@ TESTDIR = $(BASE)/test
 VPATH = $(SRCDIR):$(INC):$(OBJDIR):$(OUTDIR):$(TESTDIR)
 
 so: $(LIBNAME)
-OBJ = convstr.o trimstr.o minivm.o stqu.o crosslnk.o
+OBJ = convstr.o trimstr.o sort.o minivm.o stqu.o crosslnk.o
 TARGET = $(OBJ)
 
 objects: $(TARGET)
