@@ -13,6 +13,7 @@ typedef struct sort_element{
 }SORT_ELEMENT;
 
 #define ELEMENT_NUM     5
+#define ELEMENT_NUM_MIN 2
 #define EPSINON         0.0000001
 
 int compare(const void *p, const void *q)
@@ -43,6 +44,22 @@ int compare_float(const void *p, const void *q)
     if ((x - y) > EPSINON)
         ret = 1;
     else if ((x - y) < -EPSINON)
+        ret = -1;
+    else
+        ret = 0;
+
+    return ret;
+}
+
+int compare_char(const void *p, const void *q)
+{
+    int ret;
+    char x = *(const char *)p;
+    char y = *(const char *)q;
+
+    if (x > y)
+        ret = 1;
+    else if (x < y)
         ret = -1;
     else
         ret = 0;
@@ -128,11 +145,25 @@ void test_qsort_float(void){
     CU_ASSERT_DOUBLE_EQUAL(test_arr[4], 92.68, 0.001);
 }
 
+void test_qsort_char(void){
+    char test_arr[ELEMENT_NUM_MIN];
+    memset(test_arr, 0x00, ELEMENT_NUM_MIN * sizeof(char));
+
+    test_arr[0] = 120;
+    test_arr[1] = 2;
+
+    quick_sort(test_arr, ELEMENT_NUM_MIN, sizeof(char), compare_char);
+
+    CU_ASSERT_EQUAL(test_arr[0], 2);
+    CU_ASSERT_EQUAL(test_arr[1], 120);
+}
+
 static CU_TestInfo testcase[] = {
     { "test_trimstr:", test_trimstr },
     { "test_convstr:", test_convstr },
     { "test_qsort_struct", test_qsort_struct },
     { "test_qsort_float", test_qsort_float },
+    { "test_qsort_char", test_qsort_char },
     CU_TEST_INFO_NULL
 };
 
