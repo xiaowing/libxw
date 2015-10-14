@@ -82,6 +82,26 @@ extern "C" {
         quick_sort_recursion(base, 0, (nelem - 1), size, fcmp);
     }
 
+#ifdef WIN32
+    void __cdecl bubble_sort(void *base, int nelem, size_t size, int(*fcmp)(const void *, const void *)){
+#else
+    void bubble_sort(void *base, int nelem, size_t size, int(*fcmp)(const void *, const void *)){
+#endif
+        int i, j;
+
+        for (i = 0; i < nelem; i++){
+            for (j = 0; j < (nelem - i - 1); j++){
+                if (fcmp((const void *)((char *)base + j * size),
+                    (const void *)((char *)base + (j + 1) * size)) > 0){
+                    if (swap_element((void *)((char *)base + j * size),
+                        (void *)((char *)base + (j + 1) * size), size) < 0){
+                        exit(EXIT_PROCESS_DEBUG_EVENT);
+                    }
+                }
+            }
+        }
+    }
+
 #ifdef __cplusplus    // If used by C++ code, 
 }
 #endif

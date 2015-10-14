@@ -158,12 +158,32 @@ void test_qsort_char(void){
     CU_ASSERT_EQUAL(test_arr[1], 120);
 }
 
+void test_bsort_float(void){
+    float test_arr[ELEMENT_NUM];
+    memset(test_arr, 0x00, ELEMENT_NUM * sizeof(float));
+
+    test_arr[0] = 3.14;
+    test_arr[1] = 2.67;
+    test_arr[2] = -3.15;
+    test_arr[3] = 92.68;
+    test_arr[4] = 0.0003;
+
+    bubble_sort(test_arr, ELEMENT_NUM, sizeof(float), compare_float);
+
+    CU_ASSERT_DOUBLE_EQUAL(test_arr[0], -3.15, 0.001);
+    CU_ASSERT_DOUBLE_EQUAL(test_arr[1], 0.0003, 0.001);
+    CU_ASSERT_DOUBLE_EQUAL(test_arr[2], 2.67, 0.001);
+    CU_ASSERT_DOUBLE_EQUAL(test_arr[3], 3.14, 0.001);
+    CU_ASSERT_DOUBLE_EQUAL(test_arr[4], 92.68, 0.001);
+}
+
 static CU_TestInfo testcase[] = {
     { "test_trimstr:", test_trimstr },
     { "test_convstr:", test_convstr },
     { "test_qsort_struct", test_qsort_struct },
     { "test_qsort_float", test_qsort_float },
     { "test_qsort_char", test_qsort_char },
+    { "test_bsort_float", test_bsort_float },
     CU_TEST_INFO_NULL
 };
 

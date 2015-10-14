@@ -3,6 +3,7 @@ EXPORTS
 	convstr
 	trimstr
 	quick_sort
+	bubble_sort
 	stack_create
 	stack_dispose
 	stack_clear

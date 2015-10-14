@@ -180,6 +180,7 @@ _nodespeek_body(nodetype, a, b, c, d)
 int convstr(char * str);
 int trimstr(char * str, int len);
 void quick_sort(void *base, int nelem, size_t size, int(*fcmp)(const void *, const void *));
+void bubble_sort(void *base, int nelem, size_t size, int(*fcmp)(const void *, const void *));
 
 LIBXW_MANAGED_STACK stack_create(LIBXW_VALUE_TYPE value_type);
 int stack_dispose(LIBXW_MANAGED_STACK stack);
