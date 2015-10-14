@@ -46,13 +46,13 @@ extern "C" {
     memset(datanode_ptr, 0x00, sizeof(LIBXW_DATANODE)); \
     datanode_ptr->datatype = NODE_DATANODE_SPARE;
 
-/* The global memory management table. */
+/* The global memory pool table. */
 LIBXW_DATABLOCK_HEAD *GLOBAL_BLOCK_TABLE = NULL;
 
 /* The critical section for controlling the multi-threaded access of the global resource*/
 MUTEX_T   mutex_lock;
 
-/* The internal functions of minivm. */
+/* The internal functions of memory pool. */
 static LIBXW_DATABLOCK* initial_datablock(void){
     LIBXW_DATABLOCK* result = malloc(sizeof(LIBXW_DATABLOCK));
     if (result == NULL){

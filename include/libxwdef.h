@@ -45,18 +45,18 @@ typedef pthread_mutex_t   MUTEX_T, *MUTEX_P_PTR;
 #define Destroy_Mutex(mutex_ref)        pthread_mutex_destroy(mutex_ref)
 #endif
 
-/* Internal definition of datastructures used in minivm. */
+/* Internal definition of datastructures used in memory pool. */
 typedef struct datanode{
     int datatype;
-    char value[VALUE_LENGTH];       /* The value will be the top pointer of
-                                       the stack or queue, if the node is the head node */
+    char value[VALUE_LENGTH];                       /* The value will be the top pointer of
+                                                    the stack or queue, if the node is the head node */
     int valuelen;
     union {
         char extval[VALUE_LENGTH];
-        short extrec[SHORT_ARRAY_LEN];            /* extrec[0] for colomn, extrec[1] for row. */
+        short extrec[SHORT_ARRAY_LEN];              /* extrec[0] for colomn, extrec[1] for row. */
     }ext;
-    struct datanode *prev;          /* down pointer in matrix */
-    struct datanode *next;          /* right pointer in matrix */
+    struct datanode *prev;                          /* down pointer in matrix */
+    struct datanode *next;                          /* right pointer in matrix */
 }LIBXW_DATANODE;
 
 typedef struct datablock{

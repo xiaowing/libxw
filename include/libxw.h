@@ -20,7 +20,6 @@ Description : The header of libxw.
 typedef void * LIBXW_MANAGED_STACK;
 typedef void * LIBXW_MANAGED_QUEUE;
 typedef void * LIBXW_MANAGED_MATRIX;
-// typedef int LIBXW_VALUE_TYPE;
 
 typedef enum  node_value_type{
     NODE_VALUE_CHAR = 0x1,
