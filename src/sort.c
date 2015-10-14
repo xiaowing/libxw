@@ -50,9 +50,7 @@ extern "C" {
         for (i = store_idx; i <= end_idx; i++){
             if (fcmp((const void *)((char *)arr_ptr + i * size), 
                 (const void *)((char *)arr_ptr + pivot_idx * size)) < 0){
-                /* if (arr_ptr[i] < arr_ptr[pivot_idx]){ */
                 if (i != store_idx){
-                    /* SWAP_INTEGER(arr_ptr[i], arr_ptr[store_idx]); */
                     if (swap_element((void *)((char *)arr_ptr + i * size),
                         (void *)((char *)arr_ptr + store_idx * size), size) < 0){
                         exit(EXIT_PROCESS_DEBUG_EVENT);
@@ -65,7 +63,6 @@ extern "C" {
         store_idx--;
 
         if (pivot_idx < (store_idx)){
-            /* SWAP_INTEGER(arr_ptr[pivot_idx], arr_ptr[store_idx]); */
             if (swap_element((void *)((char *)arr_ptr + pivot_idx * size),
                 (void *)((char *)arr_ptr + store_idx * size), size) < 0){
                 exit(EXIT_PROCESS_DEBUG_EVENT);
