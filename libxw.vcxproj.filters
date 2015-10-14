@@ -30,6 +30,9 @@
     <ClCompile Include="src\crosslnk.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\sort.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="libxw.def">

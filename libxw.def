@@ -2,6 +2,7 @@ LIBRARY
 EXPORTS
 	convstr
 	trimstr
+	quick_sort
 	stack_create
 	stack_dispose
 	stack_clear
