@@ -1,5 +1,7 @@
 libxw
 =============
+[![Build Status](https://travis-ci.org/xiaowing/libxw.svg?branch=master)](https://travis-ci.org/xiaowing/libxw)
+
 ###Summary 
 A C-language library contains several utility functions and an implementation of Stack, Queue and Matrix based on a lightweight memory management.
 
