@@ -27,9 +27,6 @@ int main(void){
         AddUtilityTests();
 
         CU_basic_set_mode(CU_BRM_VERBOSE);
-        CU_basic_run_tests();
+        return CU_basic_run_tests();
     }
-
-    printf("Press any key to continue...");
-    getchar();
 }
