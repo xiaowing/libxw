@@ -27,10 +27,10 @@ extern "C" {
     static int swap_element(void *element_x, void *element_y, size_t size){
         void *temp = NULL;
 
-        if (size <= DUMMY_LENGTH){
+        if (size <= FIELD_LENGTH){
             Lock_Mutex(&mutex_lock);
-            memset((char *)(GLOBAL_BLOCK_TABLE->dummy), 0x00, size);
-            temp = GLOBAL_BLOCK_TABLE->dummy;
+            memset((char *)(GLOBAL_BLOCK_TABLE->ext_field), 0x00, size);
+            temp = GLOBAL_BLOCK_TABLE->ext_field;
             memcpy(temp, element_x, size);
             memcpy(element_x, element_y, size);
             memcpy(element_y, temp, size);
