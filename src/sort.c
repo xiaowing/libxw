@@ -18,17 +18,36 @@ Description : The common sorting algorithm for general types.
 extern "C" {
 #endif
 
+    /* The global memory pool table. */
+    extern LIBXW_DATABLOCK_HEAD *GLOBAL_BLOCK_TABLE;
+
+    /* The critical section for controlling the multi-threaded access of the global resource*/
+    extern MUTEX_T   mutex_lock;
+
     static int swap_element(void *element_x, void *element_y, size_t size){
-        void *temp = malloc(size);
-        if (temp == NULL){
-            return LIBXW_ERRNO_NULLOBJECT;
+        void *temp = NULL;
+
+        if (size <= DUMMY_LENGTH){
+            Lock_Mutex(&mutex_lock);
+            memset((char *)(GLOBAL_BLOCK_TABLE->dummy), 0x00, size);
+            temp = GLOBAL_BLOCK_TABLE->dummy;
+            memcpy(temp, element_x, size);
+            memcpy(element_x, element_y, size);
+            memcpy(element_y, temp, size);
+            Unlock_Mutex(&mutex_lock);
         }
+        else{
+            temp = malloc(size);
+            if (temp == NULL){
+                return LIBXW_ERRNO_NULLOBJECT;
+            }
 
-        memcpy(temp, element_x, size);
-        memcpy(element_x, element_y, size);
-        memcpy(element_y, temp, size);
+            memcpy(temp, element_x, size);
+            memcpy(element_x, element_y, size);
+            memcpy(element_y, temp, size);
 
-        free(temp);
+            free(temp);
+        }
 
         return 0;
     }

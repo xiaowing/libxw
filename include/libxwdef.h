@@ -16,6 +16,11 @@ Description : The header of the general definition of macros used in libxw.
 #define DUMMY_LENGTH    8
 #define SHORT_ARRAY_LEN 2
 #define DATANODE_BLOCK_LENGTH   256
+#ifdef WIN32
+#define DUMMY_LENGTH    _MAX_PATH
+#else
+#define DUMMY_LENGTH    PATH_MAX
+#endif
 
 #define LIBXW_ERRNO_NULLOBJECT -1
 #define LIBXW_ERRNO_INVALID_NODETYPE -2
@@ -69,6 +74,7 @@ typedef struct datablock_head{
     LIBXW_DATABLOCK *current_block;
     int current_node_index;
     LIBXW_DATABLOCK *next;
+    char dummy[DUMMY_LENGTH];
 }LIBXW_DATABLOCK_HEAD;
 
 #endif
