@@ -225,9 +225,12 @@ int suite_success_clean(void){
 }
 
 static CU_SuiteInfo suites[] = {
+#ifdef CUNIT_213
     { "Suite of stack test", suite_success_init, suite_success_clean, NULL, NULL, testcase },
     /* for CUnit version other than 2.1.3, the above source code should be as follows */
-    /* { "Suite of stack test", suite_success_init, suite_success_clean, testcase }, */
+#else
+    { "Suite of stack test", suite_success_init, suite_success_clean, testcase },
+#endif
     CU_SUITE_INFO_NULL
 };
 

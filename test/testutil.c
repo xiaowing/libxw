@@ -188,7 +188,11 @@ static CU_TestInfo testcase[] = {
 };
 
 static CU_SuiteInfo suites[] = {
+#ifdef CUNIT_213
     { "Suite of utility test", suite_success_init, suite_success_clean, NULL, NULL, testcase },
+#else
+    { "Suite of utility test", suite_success_init, suite_success_clean, testcase },
+#endif
     CU_SUITE_INFO_NULL
 };
 
