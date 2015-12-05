@@ -26,10 +26,10 @@ int compare(const void *p, const void *q)
     because of signed integer overflow. */
     if ((x.a == y.a) && (x.b == y.b))
         ret = 0;
-    else if ((x.a < y.a) && (x.b < y.b))
-        ret = -1;
-    else
+    else if ((x.a + x.b) >= (y.a + y.b))
         ret = 1;
+    else
+        ret = -1;
 
     return ret;
 }
@@ -177,6 +177,65 @@ void test_bsort_float(void){
     CU_ASSERT_DOUBLE_EQUAL(test_arr[4], 92.68, 0.001);
 }
 
+void test_isort_struct(void){
+    SORT_ELEMENT test_arr[ELEMENT_NUM];
+    memset(test_arr, 0x00, ELEMENT_NUM * sizeof(SORT_ELEMENT));
+
+    /* set the value of all elements. */
+    test_arr[0].a = 128;
+    test_arr[0].b = 256;
+
+    test_arr[1].a = 2;
+    test_arr[1].b = 789;
+
+    test_arr[2].a = 5;
+    test_arr[2].b = 11;
+
+    test_arr[3].a = 64;
+    test_arr[3].b = 255;
+
+    test_arr[4].a = 1024;
+    test_arr[4].b = 2048;
+
+    insert_sort(test_arr, ELEMENT_NUM, sizeof(SORT_ELEMENT), compare);
+
+    CU_ASSERT_EQUAL(test_arr[0].a, 5);
+    CU_ASSERT_EQUAL(test_arr[0].b, 11);
+
+    CU_ASSERT_EQUAL(test_arr[1].a, 64);
+    CU_ASSERT_EQUAL(test_arr[1].b, 255);
+
+    CU_ASSERT_EQUAL(test_arr[2].a, 128);
+    CU_ASSERT_EQUAL(test_arr[2].b, 256);
+
+    CU_ASSERT_EQUAL(test_arr[3].a, 2);
+    CU_ASSERT_EQUAL(test_arr[3].b, 789);
+
+    CU_ASSERT_EQUAL(test_arr[4].a, 1024);
+    CU_ASSERT_EQUAL(test_arr[4].b, 2048);
+}
+
+void test_isort_float(void){
+    float test_arr[ELEMENT_NUM];
+    memset(test_arr, 0x00, ELEMENT_NUM * sizeof(float));
+
+    test_arr[0] = 3.14;
+    test_arr[1] = 2.67;
+    test_arr[2] = -3.15;
+    test_arr[3] = 92.68;
+    test_arr[4] = 0.0003;
+
+    insert_sort(test_arr, ELEMENT_NUM, sizeof(float), compare_float);
+
+    CU_ASSERT_DOUBLE_EQUAL(test_arr[0], -3.15, 0.001);
+    CU_ASSERT_DOUBLE_EQUAL(test_arr[1], 0.0003, 0.001);
+    CU_ASSERT_DOUBLE_EQUAL(test_arr[2], 2.67, 0.001);
+    CU_ASSERT_DOUBLE_EQUAL(test_arr[3], 3.14, 0.001);
+    CU_ASSERT_DOUBLE_EQUAL(test_arr[4], 92.68, 0.001);
+}
+
+
+
 static CU_TestInfo testcase[] = {
     { "test_trimstr:", test_trimstr },
     { "test_convstr:", test_convstr },
@@ -184,6 +243,8 @@ static CU_TestInfo testcase[] = {
     { "test_qsort_float", test_qsort_float },
     { "test_qsort_char", test_qsort_char },
     { "test_bsort_float", test_bsort_float },
+    { "test_isort_struct", test_isort_struct },
+    { "test_isort_float", test_isort_float },
     CU_TEST_INFO_NULL
 };
 

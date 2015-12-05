@@ -121,6 +121,40 @@ extern "C" {
         }
     }
 
+#ifdef WIN32
+    void __cdecl insert_sort(void *base, int nelem, size_t size, int(*fcmp)(const void *, const void *)){
+#else
+    void insert_sort(void *base, int nelem, size_t size, int(*fcmp)(const void *, const void *)){
+#endif
+        int sorting_idx, i;
+        void * temp_element = NULL;
+        temp_element = malloc(size);
+        if (temp_element == NULL)
+        {
+            exit(EXIT_PROCESS_DEBUG_EVENT);
+        }
+
+        for (sorting_idx = 1; sorting_idx < nelem; sorting_idx++){
+            memcpy(temp_element, (void *)((char *)base + sorting_idx * size), size);
+
+            for (i = (sorting_idx - 1); i >= 0; i--){
+                
+                if (fcmp((const void *)((char *)base + i * size),
+                    (const void *)(temp_element)) > 0){
+                    memcpy((void *)((char *)base + (i + 1) * size), (void *)((char *)base + i * size), size);
+                    if (i == 0){
+                        memcpy((void *)((char *)base + i * size), temp_element, size);
+                    }
+                }
+                else{
+                    memcpy((void *)((char *)base + (i + 1) * size), temp_element, size);
+                    break;
+                }
+            }
+        }
+        free(temp_element);
+    }
+
 #ifdef __cplusplus    // If used by C++ code, 
 }
 #endif
