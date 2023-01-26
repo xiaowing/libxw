@@ -3,7 +3,7 @@ libxw
 [![Build Status](https://travis-ci.org/xiaowing/libxw.svg?branch=master)](https://travis-ci.org/xiaowing/libxw)
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-###Summary 
+## Summary 
 A C-language library contains several utility functions and an implementation of Stack, Queue and Matrix based on a lightweight memory management.
 
 Currently this library contains the following content.
@@ -13,12 +13,12 @@ Currently this library contains the following content.
 3. Data structure of an implementation of matrix (based on the implementation of cross linked list) and a set of functions to use the matrix.
 4. A set of utilities to deal with the C-style string(which ends with '\0'). Such as trim and reverse.
 
-###API references
+## API references
 ~(under construction)~
 
-###How to build the source code?
+## How to build the source code?
 
-####Linux
+### Linux
 Build environment:
 * gcc
 * python(2.5+)
@@ -33,9 +33,9 @@ Build steps:
     $make install
 ```
 
-The binary will be copied to /usr/lib(/usr/lib/libxw.so) and the header will be copied to /usr/include(/usr/include/libxw.h /usr/include/libxwdef.h).
+The binary will be copied to `/usr/lib`(`/usr/lib/libxw.so`) and the header will be copied to `/usr/include`(`/usr/include/libxw.h`& `/usr/include/libxwdef.h`).
 
-####Windows
+### Windows
 Build environment:
 * Visual Studio 2013 or above
 
@@ -44,30 +44,34 @@ Build steps:
 1. Open the libxw.sln with Visual Studio.
 2. Then, you know what to do:)
 
-###How to run the test code ?
+## How to run the test code ?
+
 The test code of libxw was written under the assumption that the test code would be run with CUnit framework.
 However, no distribution of cunit will be delivered with the source code due to the issue of license.
 If you want to run the test code, the following steps will be needed.
 
-####Linux
+### Linux
+
 1. Install CUnit. Please refer to [CUnit Home](http://cunit.sourceforge.net/).
 2. Modify the Makefile to change the INCLDIR value according to the result of installation of CUnit
 
     for example: INCLDIR = /usr/include   # change it to the path of your Cunit headers({INCLDIR}/CUnit).
 
 3. Compile the test program like this.
-```
+
+````sh
     $make test
-```
+````
 
 __Note:__ 
 Due to the interface change of CUnit-2.1.3, you should add a pre-definition of the macro "CUNIT_213" before compiling.
 Edit Makefile with any editor you have, and modify it as follows:
-```
-    TESTOPT = -Wall -O2 $(TESTINCL) $(TESTLNK) -D CUNIT_213
-```
 
-####Windows
+````
+    TESTOPT = -Wall -O2 $(TESTINCL) $(TESTLNK) -D CUNIT_213
+````
+
+### Windows
 1. Build the CUnit source code in Windows.
 2. Move all the headers of CUnit to the directory __test\include__.
 3. Move the generated __.lib__ file(libcunit_dll.lib) to the directory __test\lib__ or __test\lib\x64__(if builded as x64 binary).
@@ -77,6 +81,7 @@ Edit Makefile with any editor you have, and modify it as follows:
 __Note:__ 
 Due to the interface change of CUnit-2.1.3, you should add a pre-definition of the macro "CUNIT_213" before compiling.
 Edit test_libxw.vcproj with any editor you have, and modify all the <PreprocessorDefinitions> sections as follows:
-```
+
+````xml
     <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;CUNIT_213;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-```
+````
